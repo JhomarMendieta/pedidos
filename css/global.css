@@ -1,0 +1,13 @@
+:root {
+    /* Colores */
+    --btn-red: #e80000;
+    --btn-green: #00bb35;
+    --btn-blue: #009af9;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: arial;
+}
