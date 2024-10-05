@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
+from datetime import datetime
 from flask_mysqldb import MySQL
-from flask_cors import CORS  # Importar CORS
+from flask_cors import CORS  
 import MySQLdb.cursors
 
 app = Flask(__name__)
@@ -19,18 +20,20 @@ def recibir_mensaje():
     data = request.get_json()
     mensaje = data.get('message').lower()
     step = data.get('step')
+    id_usuario = data.get('id_usuario')
     
-    # Nuevos datos recibidos
     herramienta_seleccionada = data.get('herramienta_seleccionada')
     cantidad_pedida = data.get('cantidad_pedida')
     
-    herramientas = [
-        {"nombre": "Martillo", "cantidad": 6, "id_herramienta": 1},
-        {"nombre": "Lima", "cantidad": 3, "id_herramienta": 2},
-        {"nombre": "Destornillador", "cantidad": 4, "id_herramienta": 3},
-        {"nombre": "Maza", "cantidad": 0, "id_herramienta": 4}
-    ]
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("SELECT id, nombre, cantidad FROM tipos_herramienta")
     
+    herramienta = cursor.fetchall()
+    
+    cursor.close()
+
+    herramientas = herramienta
+    print(herramienta)
     if mensaje:
         if step == "inicial":
             response = {
@@ -59,7 +62,7 @@ def recibir_mensaje():
                             f"¿Cuántos {herramienta_seleccionada['nombre']} vas a pedir? Quedan {herramienta_seleccionada['cantidad']} disponibles.<br>- <a onclick=\"enviartexto('elegir otra herramienta')\">Elegir otra herramienta</a>",
                             "cantidad",
                             herramienta_seleccionada,
-                            0  # Inicializamos la cantidad pedida a 0
+                            0  
                         ]
                     }
                 else:
@@ -103,10 +106,27 @@ def recibir_mensaje():
         
         elif step == "confirmar" and mensaje == "confirmar pedido":
             if herramienta_seleccionada and cantidad_pedida:
+                usuario_fk = id_usuario  # Asegúrate de que id_usuario esté definido
+                fecha = datetime.now()  # Obtener la fecha actual
+                estado_fk = herramienta_seleccionada["id"]
+
+                cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+                # Corregir la consulta SQL: falta una coma entre `estado_fk` y `cantidad_solicitada`
+                cursor.execute("INSERT INTO pedidos (usuario_fk, fecha, estado_fk) VALUES (%s, %s, %s)",
+                            (usuario_fk, fecha, estado_fk))
+                
+                mysql.connection.commit()  # Confirmar los cambios en la base de datos
+                cursor.close()  # Cerrar el cursor
+                
+                # Respuesta al cliente
                 response = {
-                    "response": [f"Pedido completado: {herramienta_seleccionada['nombre']}<br> Cantidad: {cantidad_pedida}. Gracias por utilizar este servicio", "inicial", {}, 0]
+                    "response": [
+                        f"Pedido completado: {herramienta_seleccionada['nombre']}<br> Cantidad: {cantidad_pedida}. Gracias por utilizar este servicio",
+                        "inicial",
+                        {},
+                        0
+                    ]
                 }
-        
         else:
             response = {
                 "response": ["No entiendo tu solicitud. Por favor elige una opción válida.", "opciones", {}, 0]

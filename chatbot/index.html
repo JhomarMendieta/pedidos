@@ -15,6 +15,7 @@
                 <input type="hidden" name="step" id="step" value="inicial" required>
                 <input type="hidden" name="herramienta" id="herramienta" value="{}" required>
                 <input type="hidden" name="cantidad" id="cantidad" value="0" required>
+                <input type="hidden" name="id_usuario" id="id_usuario" value="1" required>
                 <button type="submit">Enviar</button>
         </form>
     </div>
@@ -31,6 +32,7 @@
     const herramienta = document.getElementById("herramienta");
     const userMessage = input.value;
     const step = input2.value;
+    const id_usuario = document.getElementById("id_usuario");
     
     if (userMessage.trim() !== "") {
         createMessage(userMessage, "user");
@@ -41,13 +43,13 @@
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ message: userMessage, step: step, herramienta_seleccionada: JSON.parse(herramienta.value), cantidad_pedida: cantidad.value }),
+            body: JSON.stringify({ message: userMessage, step: step, herramienta_seleccionada: JSON.parse(herramienta.value), cantidad_pedida: cantidad.value , id_usuario: id_usuario.value }),
         })
         .then(response => response.json())
         .then(data => {
             console.log(data);
             if (data.response) {
-                createMessage(data.response[0], "bot");
+                createMessage(data.response[0], "bot"); 
                 input2.value = data.response[1]
                 cantidad.value = data.response[3]
                 herramienta.value = JSON.stringify(data.response[2])
