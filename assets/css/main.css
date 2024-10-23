@@ -8,17 +8,91 @@
 
 
 
-/* Lista herramienta */
+.modal {
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Color de fondo semitransparente */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    width: 90%;
+    max-width: 800px;
+
+    margin: 0 auto;
+    margin-top: 100px;
+    padding: 20px;
+    border: 1px solid #888;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 30px 50px 200px 50px;
+    grid-template-columns:
+        "cerrar-modal cerrar-modal"
+        "img-modal nombre-modal"
+        "img-modal datos-modal"
+        "cantidad-modal botones-modal";
+}
+
+.modal-img {
+    grid-area: "img-modal";
+    grid-row: 2/4;
+}
+
+.cerrar-button {
+    grid-area: "cerrar-modal";
+    grid-column: 1/3;
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.cerrar-button:hover,
+.cerrar-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-nombre {
+    grid-area: "nombre-modal";
+}
+
+.modal-datos-herramienta {
+    grid-area: "datos-modal";
+}
+
+.modal-cantidad {
+    grid-area: "cantidad-modal";
+}
+
+.modal-botones {
+    grid-area: "botones-modal";
+}
+
+
+
+
+
 .busqueda-herramienta {
     width: 100%;
     height: 60px;
     display: flex;
     align-items: center;
     margin-bottom: 20px;
+    gap: 20px;
+
 }
 
-.busqueda-herramienta input {
-    width: 100%;
+.busqueda-herramienta input[type="text"] {
+    width: calc(100% - (120px + 20px));
     height: 50px;
     padding-left: 10px;
     font-size: 1.2rem;
@@ -26,6 +100,23 @@
     outline: none;
     box-shadow: 0px 2px 4px inset #898989;
     border-radius: 5px;
+}
+
+.busqueda-herramienta input[type="submit"] {
+    width: 120px;
+    height: 50px;
+    background-color: var(--btn-blue);
+    font-size: 1.2rem;
+    border: none;
+    outline: none;
+    box-shadow: 0px 2px 4px #898989;
+    border-radius: 5px;
+    color: #fff;
+    transition: all .2s ease;
+}
+
+.busqueda-herramienta input[type="submit"]:hover {
+    box-shadow: 0px 0px 2px #898989;
 }
 
 .contenedor-lista-herramientas {
@@ -45,6 +136,7 @@
     grid-template-rows: 220px 1fr 20px;
     padding: 15px;
     gap: 10px;
+    cursor: pointer;
 }
 
 .contenedor-lista-herramientas .herramienta .img {
@@ -78,6 +170,11 @@
 
 /* Lista de herramientas */
 .contenedor-herramientas-pedidas {
+    display: grid;
+    gap: 20px;
+}
+
+.contenedor-herramientas-pedidas .herramienta {
     width: 100%;
     height: 300px;
     border-radius: 10px;

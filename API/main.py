@@ -2,8 +2,10 @@ from flask import Flask, request, jsonify
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 from datetime import timedelta
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # Configuración de la base de datos MySQL
 app.config['MYSQL_USER'] = 'root'
@@ -387,14 +389,77 @@ def eliminar_categoria():
 # eliminar consumible
 
 
-
-
 # PROBAR LA BD CASCADE, LOS ENDPOINTS DELETE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 #########################################################################################################
 #pedidos
+
+# @app.route('/lista_herramientas_index', methods=['GET'])
+# def lista_herramientas_index():
+#     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#     # Corregir el INNER JOIN y SELECT
+#     cursor.execute("""
+#         SELECT h.id, h.imagen, h.tipo_id, th.nombre, th.disponibles
+#         FROM herramientas h 
+#         INNER JOIN tipos_herramienta th ON h.tipo_id = th.id
+#     """)
+#     lista_herramientas_index = cursor.fetchall()
+#     cursor.close()
+    
+#     # Retornar los datos en formato JSON
+#     return jsonify(lista_herramientas_index)
+
+
+@app.route('/datos_herramienta_pedidos', methods=['GET'])
+def datos_herramienta_pedidos():
+    with mysql.connection.cursor(MySQLdb.cursors.DictCursor) as cursor:
+        cursor.execute("""
+            SELECT h.id, 
+                   h.imagen, 
+                   h.tipo_id,
+                   th.nombre, 
+                   th.disponibles, 
+                   sc.nombre AS subcategoria_nombre, 
+                   c.nombre AS categoria_nombre 
+            FROM herramientas h
+            INNER JOIN tipos_herramienta th ON h.tipo_id = th.id
+            INNER JOIN subcategorias sc ON th.subcategoria_id = sc.id
+            INNER JOIN categorias c ON sc.categoria_id = c.id
+        """)
+
+        datos_herramienta_pedidos = cursor.fetchall()
+
+    # Verificar si hay resultados
+    if datos_herramienta_pedidos:
+        return jsonify(datos_herramienta_pedidos), 200
+    else:
+        return jsonify({'message': 'No se encontraron herramientas'}), 404
+
+
+
+
+# SELECT h.id, h.imagen, h.tipo_id, th.nombre, th.disponibles
+#             FROM herramientas h
+#             INNER JOIN tipos_herramienta th ON h.tipo_id = th.id
+#             WHERE th.nombre LIKE %s
+
 
 # Obtener todos los pedidos
 @app.route('/pedidos', methods=['GET'])
@@ -442,7 +507,7 @@ def get_pedido(id):
     # Obtener el pedido y sus herramientas
     cursor.execute("""
         SELECT p.id, p.fecha, p.horario, u.nombre as usuario, e.estado,
-               th.nombre as herramienta, ph.cantidad as cantidad_herramienta
+        th.nombre as herramienta, ph.cantidad as cantidad_herramienta
         FROM pedidos p
         LEFT JOIN usuarios u ON p.usuario_fk = u.id
         LEFT JOIN estado e ON p.estado_fk = e.id
