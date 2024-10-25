@@ -18,6 +18,24 @@
     z-index: 8999;
 }
 
+.boton_nav {
+    position: fixed;
+    left: 0;
+    top: 30px;
+    background-color: #898989;
+    color: white; /* Text color */
+    padding: 10px 10px; /* Padding for a larger clickable area */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 16px; /* Font size */
+    font-weight: bold; /* Bold text */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.boton_nav:hover {
+    background-color: #6f6f6f; /* Darker shade on hover */
+}
+
 .nav {
     position: fixed;
     top: 0;
