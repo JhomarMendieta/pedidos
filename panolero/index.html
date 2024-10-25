@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="assets/css/global.css">
-    <link rel="stylesheet" href="assets/css/header.css">
-    <link rel="stylesheet" href="assets/css/main.css">
-    <link rel="stylesheet" href="assets/css/nav.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/header.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/nav.css">
     <title>Document</title>
 </head>
 
@@ -38,20 +38,25 @@
                 <a href="./chatbot/index.html" class="opcion">
                     <p>ChatBot</p>
                 </a>
+                <p class="opcion" style="font-weight: bold;">Funciones pañolero</p>
+                <a href="cambiar-estado-pedido.html" class="opcion">
+                    <p>Cambiar estado de pedido</p>
+                </a>
             </div>
         </div>
     </nav>
     <main class="main">
         <form action="" class="busqueda-herramienta" onsubmit="return buscarHerramientas(event)">
             <input type="text" name="query" id="search-input"
-                placeholder="Buscar herramienta...    (Deje el campo vacio para ver todas la herramientas)">
+                placeholder="Buscar herramienta...    (Deje el campo vacio para ver todas las herramientas)">
             <input type="submit" value="Buscar">
         </form>
-        <!-- Modal -->
         <div id="modal" class="modal" style="display:none;">
             <div class="modal-content">
-                <img class="modal-img" src="" alt="imagen de la herramienta">
-                <span id="cerrar-modal" class="cerrar-button"></span>
+                <span id="cerrar-modal" class="cerrar-button"><i class="fa-solid fa-xmark"></i></span>
+                <div class="cont-modal-img">
+                    <img class="modal-img" src="" alt="imagen de la herramienta">
+                </div>
                 <h2 class="modal-nombre"></h2>
                 <div class="modal-datos-herramienta">
                     <p class="modal-tipo"></p>
@@ -60,9 +65,10 @@
                     <p class="modal-cantidad"></p>
                 </div>
                 <div class="modal-cantidad">
-                    <button class="cant-restar"></button>
-                    <input type="number" name="pedir_cantidad" id="pedir_cantidad">
-                    <button class="cant-sumar"><i class="fa-solid fa-plus"></i></button>
+                    <p class="modal-text">¿Cuantos quiere?</p>
+                    <div class="cont">
+                        <input type="number" name="pedir_cantidad" id="pedir_cantidad" min="1">
+                    </div>
                 </div>
                 <div class="modal-botones">
                     <button class="modal-añadir">Añadir al pedido</button>
@@ -70,27 +76,14 @@
                 </div>
             </div>
         </div>
+
         <div class="contenedor-lista-herramientas" id="contenedor-lista-herramientas">
-            <!-- <div class="herramienta">
-                <div class="img">
-                    <img src="" alt="">
-                    <i class="fa-solid fa-image"></i>
-                </div>
-                <div class="datos">
-                    <p class="nombre-herramienta">Nombre de la herramienta</p>
-                    <p>Tipo herramienta</p>
-                </div>
-                <div class="cantidad">
-                    <p>Cant. disponible: </p>
-                </div>
-            </div> -->
         </div>
     </main>
 
-    <script src="assets/js/buscar_herramientas.js"></script>
-    <script src="assets/js/modal_index.js" defer></script>
-    <script src="assets/js/localstorage_guardar.js"></script>
-    <script src="assets/js/sumar-restar.js"></script>
+    <script src="../assets/js/buscar_herramientas.js"></script>
+    <script src="../assets/js/modal_index.js"></script>
+    <script src="../assets/js/localstorage_guardar.js"></script>
     <script src="https://kit.fontawesome.com/45f45403cb.js" crossorigin="anonymous"></script>
 </body>
 

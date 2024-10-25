@@ -12,7 +12,7 @@ function mostrarModal(id, imagen, nombre, categoria_nombre, subcategoria_nombre,
     const cantidadHerramienta = document.querySelector(".modal-cantidad");
     const cantidadInput = document.querySelector('#pedir_cantidad');
 
-    imgHerramienta.src = imagen || 'ruta_imagen_predeterminada'; 
+    imgHerramienta.src = imagen || 'ruta_imagen_predeterminada';
     nombreHerramienta.textContent = nombre;
     nombreHerramienta.setAttribute('data-id', id);
     tipoHerramienta.textContent = `Tipo de herramienta: ${categoria_nombre}`;
@@ -64,6 +64,6 @@ document.querySelector('.modal-añadir').addEventListener('click', function () {
         pedirCantidad: parseInt(document.getElementById('pedir_cantidad').value),
     };
 
-    añadirAlPedido(nuevaHerramienta); 
-    cerrarModal(); 
+    añadirAlPedido(nuevaHerramienta);
+    cerrarModal();
 });

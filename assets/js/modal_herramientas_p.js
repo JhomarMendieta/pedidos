@@ -1,52 +1,82 @@
-const pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
+let pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
+const contenedorHerramientas = document.getElementById('herramientas-lista');
+const modal = document.getElementById('modalModificar');
+const closeModal = document.getElementById('closeModal');
+const formModificar = document.getElementById('modificarForm');
+const inputCantidadNueva = document.getElementById('cantidadNueva');
+const inputHerramientaId = document.getElementById('herramientaId');
 
-const contenedorHerramientas = document.getElementById('contenedor-herramientas-pedidas');
+// Renderizar herramientas
+function renderizarHerramientas() {
+    contenedorHerramientas.innerHTML = '';
+    pedidos.forEach(herramienta => {
+        if (!herramienta.id) {
+            herramienta.id = Date.now() + Math.random();
+        }
+        const herramientaHTML = `
+            <div class="herramienta" id="herramienta-${herramienta.id}">
+                <div class="img">
+                    <img src="${herramienta.imagen || 'assets/img/no-hay-imagen.png'}" alt="${herramienta.nombre}">
+                </div>
+                <p class="nombre-herramienta">${herramienta.nombre}</p>
+                <div class="datos">
+                    <p>Tipo: ${herramienta.tipo}</p>
+                    <p>Subcategoría: ${herramienta.subcategoria}</p>
+                    <p>Consumible: ${herramienta.consumible}</p>
+                    <p>Cantidad disponible: ${herramienta.cantidadDisponible}</p>
+                </div>
+                <p class="cantidad">Cant. pedida: ${herramienta.pedirCantidad} unidades</p>
+                <div class="btns">
+                    <button onclick="abrirModalModificar('${herramienta.id}')">¿Modificar?</button>
+                    <button onclick="eliminarHerramienta('${herramienta.id}')">Eliminar</button>
+                </div>
+            </div>
+        `;
+        contenedorHerramientas.innerHTML += herramientaHTML;
+    });
+}
 
-const modal = document.getElementById('modal');
-const modalNombre = modal.querySelector('.modal-nombre');
-const modalTipo = modal.querySelector('.modal-tipo');
-const modalSubcategoria = modal.querySelector('.modal-subcategoria');
-const modalConsumible = modal.querySelector('.modal-consumible');
-const modalCantidadDisponible = modal.querySelector('.modal-cantidad');
-const modalCantidadInput = modal.querySelector('#pedir_cantidad');
-const modalCerrar = document.getElementById('cerrar-modal');
-const modalAñadirBtn = modal.querySelector('.modal-añadir');
+// Abrir modal para modificar cantidad
+function abrirModalModificar(id) {
+    const herramienta = pedidos.find(h => h.id === id);
+    inputHerramientaId.value = id;
+    inputCantidadNueva.value = herramienta.pedirCantidad;
+    modal.style.display = 'block';
+}
 
-contenedorHerramientas.addEventListener('click', (e) => {
-    if (e.target.classList.contains('modificar-btn')) {
-        const index = e.target.getAttribute('data-index');
-        const pedido = pedidos[index];
-
-        modalNombre.textContent = pedido.nombre;
-        modalTipo.textContent = `Tipo: ${pedido.tipo}`;
-        modalSubcategoria.textContent = `Subcategoría: ${pedido.subcategoria}`;
-        modalConsumible.textContent = `¿Consumible?: ${pedido.consumible}`;
-        modalCantidadDisponible.textContent = `Cantidad disponible: ${pedido.cantidadDisponible}`;
-        modalCantidadInput.value = pedido.pedirCantidad;
-
-        modal.style.display = 'flex';
-
-        modalAñadirBtn.setAttribute('data-index', index);
-    }
-});
-
-modalCerrar.addEventListener('click', () => {
+// Cerrar modal
+closeModal.onclick = () => {
     modal.style.display = 'none';
-});
+};
 
-modal.querySelector('.modal-cancelar').addEventListener('click', () => {
-    modal.style.display = 'none';
-});
+// Función para eliminar herramienta
+function eliminarHerramienta(id) {
+    pedidos = pedidos.filter(h => h.id !== id);
+    localStorage.setItem('pedidos', JSON.stringify(pedidos));
+    renderizarHerramientas();
+}
 
-modalAñadirBtn.addEventListener('click', (e) => {
-    const index = e.target.getAttribute('data-index');
-    const nuevaCantidad = modalCantidadInput.value;
+// Guardar cambios de cantidad pedida
+formModificar.onsubmit = function (event) {
+    event.preventDefault();
+    const id = inputHerramientaId.value;
+    const nuevaCantidad = inputCantidadNueva.value;
 
-    pedidos[index].pedirCantidad = nuevaCantidad;
+    // Actualizar la cantidad pedida en el array
+    pedidos = pedidos.map(h => {
+        if (h.id === id) {
+            h.pedirCantidad = nuevaCantidad;
+        }
+        return h;
+    });
 
+    // Guardar en localStorage
     localStorage.setItem('pedidos', JSON.stringify(pedidos));
 
-    renderPedidos();
-
+    // Cerrar modal y volver a renderizar
     modal.style.display = 'none';
-});
+    renderizarHerramientas();
+};
+
+// Renderizar herramientas al cargar la página
+renderizarHerramientas();

@@ -1,11 +1,25 @@
-const sumarBtn = modal.querySelector('.cant-sumar');
-const restarBtn = modal.querySelector('.cant-restar');
-sumarBtn.addEventListener('click', () => {
-    modalCantidadInput.value = parseInt(modalCantidadInput.value) + 1;
-});
+document.addEventListener('click', function (event) {
+    const sumarBtn = event.target.closest('.cant-sumar');
+    const restarBtn = event.target.closest('.cant-restar');
+    const cantidadInput = document.querySelector('#pedir_cantidad');
 
-restarBtn.addEventListener('click', () => {
-    if (modalCantidadInput.value > 1) {
-        modalCantidadInput.value = parseInt(modalCantidadInput.value) - 1;
+    if (!cantidadInput) {
+        return; // Si no existe el input, salimos de la función
+    }
+
+    if (sumarBtn) {
+        let valorActual = parseInt(cantidadInput.value);
+        let maximo = parseInt(cantidadInput.getAttribute('max'));
+        if (valorActual < maximo) {
+            cantidadInput.value = valorActual + 1;
+        }
+    }
+
+    if (restarBtn) {
+        let valorActual = parseInt(cantidadInput.value);
+        let minimo = parseInt(cantidadInput.getAttribute('min'));
+        if (valorActual > minimo) {
+            cantidadInput.value = valorActual - 1;
+        }
     }
 });

@@ -23,7 +23,7 @@
 .modal-content {
     background-color: #fefefe;
     width: 90%;
-    max-width: 800px;
+    max-width: 700px;
 
     margin: 0 auto;
     margin-top: 100px;
@@ -33,25 +33,33 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 30px 50px 200px 50px;
-    grid-template-columns:
+    grid-template-areas:
         "cerrar-modal cerrar-modal"
         "img-modal nombre-modal"
         "img-modal datos-modal"
         "cantidad-modal botones-modal";
+    column-gap: 5px;
 }
 
-.modal-img {
+.cont-modal-img {
     grid-area: "img-modal";
+    grid-column: 1/2;
     grid-row: 2/4;
+}
+
+.cont-modal-img .modal-img {
+    height: 100%;
 }
 
 .cerrar-button {
     grid-area: "cerrar-modal";
     grid-column: 1/3;
+    grid-row: 1/2;
     color: #aaa;
-    float: right;
     font-size: 28px;
     font-weight: bold;
+    display: flex;
+    justify-content: end;
 }
 
 .cerrar-button:hover,
@@ -63,20 +71,72 @@
 
 .modal-nombre {
     grid-area: "nombre-modal";
+    grid-column: 2/3;
+    grid-row: 2/3;
 }
 
 .modal-datos-herramienta {
     grid-area: "datos-modal";
+    grid-column: 2/3;
+    grid-row: 3/4;
 }
 
 .modal-cantidad {
     grid-area: "cantidad-modal";
+    grid-column: 1/2;
+    grid-row: 4/5;
+
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
 .modal-botones {
     grid-area: "botones-modal";
+    grid-column: 2/3;
+    grid-row: 4/5;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
 }
 
+.modal-cantidad .cont {
+    display: flex;
+}
+
+.modal-cantidad .cont input {
+    border: none;
+    border: 1px solid #000;
+    width: 50px;
+    text-align: center;
+    outline: none;
+}
+
+.modal-cantidad .cont button {
+    background: none;
+    border: none;
+    padding: 10px;
+}
+
+.modal-botones button {
+    width: 120px;
+    height: 35px;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+}
+
+.modal-botones button:hover {
+    box-shadow: 0px 0px 5px #888;
+}
+
+.modal-botones .modal-añadir {
+    background-color: var(--btn-blue);
+}
+
+.modal-botones .modal-cancelar {
+    background-color: var(--btn-red);
+}
 
 
 
@@ -201,6 +261,10 @@
     place-items: center;
 }
 
+.contenedor-herramientas-pedidas .img img {
+    width: 100%;
+}
+
 .contenedor-herramientas-pedidas .img i {
     font-size: 5rem;
     color: #898989;
@@ -256,6 +320,11 @@
 
 
 /* Tu pedido */
+#contenedor-tu-pedido {
+    display: grid;
+    gap: 20px;
+}
+
 .contenedor-tu-pedido {
     width: 100%;
     max-width: 1000px;

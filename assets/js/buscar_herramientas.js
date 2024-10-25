@@ -14,9 +14,9 @@ function crearHerramientaHTML(herramienta) {
     `;
 }
 
-async function obtenerHerramientas() {
+async function obtenerHerramientas(query = '') {
     try {
-        const response = await fetch('http://localhost:5000/datos_herramienta_pedidos');
+        const response = await fetch(`http://localhost:5000/datos_herramienta_pedidos?query=${encodeURIComponent(query)}`);
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -33,7 +33,7 @@ async function obtenerHerramientas() {
                 contenedor.innerHTML += herramientaHTML;
             });
         } else {
-            contenedor.innerHTML = '<p>No hay herramientas disponibles.</p>'; 
+            contenedor.innerHTML = '<p>No hay herramientas disponibles.</p>';
         }
 
     } catch (error) {
@@ -42,4 +42,14 @@ async function obtenerHerramientas() {
     }
 }
 
-obtenerHerramientas();
+// Llamar a la función obtenerHerramientas sin parámetro para mostrar todas las herramientas al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+    obtenerHerramientas();  // Esto hará que se carguen todas las herramientas al inicio
+});
+
+// Función para manejar el evento de búsqueda
+function buscarHerramientas(event) {
+    event.preventDefault();  // Prevenir el envío del formulario
+    const query = document.getElementById('search-input').value;  // Obtener el valor del input de búsqueda
+    obtenerHerramientas(query);  // Llamar a la función con el parámetro de búsqueda
+}
