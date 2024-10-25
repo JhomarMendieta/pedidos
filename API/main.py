@@ -651,7 +651,40 @@ def obtener_estados_pedidos():
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
+    
+@app.route('/actualizar_herramienta', methods=['POST'])
+def actualizar_herramienta():
+    data = request.get_json()
+    tool_id = data.get('tool_id')
+    quantity_ordered = data.get('quantity')
 
+    if not tool_id or not quantity_ordered:
+        return jsonify({'message': 'Faltan datos necesarios'}), 400
+
+    with mysql.connection.cursor() as cursor:
+        # Check current available quantity
+        cursor.execute("""
+            SELECT disponibles FROM tipos_herramienta WHERE id = %s
+        """, (tool_id,))
+        result = cursor.fetchone()
+
+        if not result:
+            return jsonify({'message': 'Herramienta no encontrada'}), 404
+
+        available_quantity = result['disponibles']
+
+        # Check if enough tools are available
+        if available_quantity < quantity_ordered:
+            return jsonify({'message': 'No hay suficientes herramientas disponibles'}), 400
+
+        # Update the available quantity
+        new_quantity = available_quantity - quantity_ordered
+        cursor.execute("""
+            UPDATE tipos_herramienta SET disponibles = %s WHERE id = %s
+        """, (new_quantity, tool_id))
+        mysql.connection.commit()
+
+    return jsonify({'message': 'Cantidad actualizada correctamente', 'nueva_cantidad': new_quantity}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
