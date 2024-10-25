@@ -4,6 +4,7 @@
     height: fit-content;
     min-height: calc(100vh - 80px);
     margin: 0 auto;
+    padding: 0 20px;
 }
 
 

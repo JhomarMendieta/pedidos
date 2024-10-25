@@ -567,8 +567,9 @@ def obtener_pedidos():
         # Conexión y consulta SQL para obtener todos los pedidos
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         consulta = '''
-        SELECT pedidos.id, pedidos.fecha, pedidos.horario, estado.estado, 
-               pedido_herramientas.cantidad, tipos_herramienta.nombre 
+        SELECT  pedidos.id AS id_pedido, pedidos.fecha, pedidos.horario, estado.estado, 
+                pedido_herramientas.cantidad, tipos_herramienta.nombre,
+                usuarios.nombre AS nombre_usuario
         FROM pedidos
         INNER JOIN usuarios ON usuarios.id = pedidos.usuario_fk
         INNER JOIN estado ON pedidos.estado_fk = estado.id
@@ -582,7 +583,7 @@ def obtener_pedidos():
 
         pedidos_dict = {}
         for pedido in datos_pedidos:
-            pedido_id = pedido['id']
+            pedido_id = pedido['id_pedido']
             if pedido_id not in pedidos_dict:
                 # Convertir la hora (timedelta) a una cadena antes de enviarla
                 hora = str(pedido['horario']) if isinstance(pedido['horario'], timedelta) else pedido['horario']
