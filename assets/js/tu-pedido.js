@@ -1,10 +1,9 @@
-// assets/js/enviar_pedido.js
 document.addEventListener('DOMContentLoaded', function () {
     obtenerPedidosUsuario();
 });
 
 function obtenerPedidosUsuario() {
-    fetch('http://127.0.0.1:5000/obtener_pedidos_usuario?usuario_id=2') // Cambia el usuario_id si es necesario
+    fetch('http://127.0.0.1:5000/obtener_pedidos_usuario?usuario_id=2')
         .then(response => response.json())
         .then(data => mostrarPedidos(data))
         .catch(error => console.error('Error al obtener los pedidos:', error));
@@ -12,10 +11,9 @@ function obtenerPedidosUsuario() {
 
 function mostrarPedidos(pedidos) {
     const contenedor = document.getElementById('contenedor-tu-pedido');
-    contenedor.innerHTML = ''; // Limpiar el contenedor antes de agregar nuevos elementos
+    contenedor.innerHTML = '';
 
     pedidos.forEach(pedido => {
-        // Crear el HTML para cada pedido
         const pedidoHTML = `
         <div class="contenedor-tu-pedido">
             <div class="estado">
@@ -38,7 +36,6 @@ function mostrarPedidos(pedidos) {
         </div>
         `;
 
-        // Crear un contenedor para el pedido y agregarlo al HTML
         const pedidoContenedor = document.createElement('div');
         pedidoContenedor.classList.add('pedido');
         pedidoContenedor.innerHTML = pedidoHTML;

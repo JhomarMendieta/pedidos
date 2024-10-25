@@ -17,7 +17,6 @@ function mostrarModal(id, imagen, nombre, categoria_nombre, subcategoria_nombre,
     consumibleHerramienta.textContent = consumible ? "Es consumible" : "No es consumible";
     cantidadHerramienta.textContent = `Cantidad disponible: ${cantidad}`;
 
-    // Configuración del valor inicial, min y max
     cantidadInput.value = 1;
     cantidadInput.setAttribute('max', cantidad);
 

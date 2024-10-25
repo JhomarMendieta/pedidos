@@ -4,7 +4,7 @@ document.addEventListener('click', function (event) {
     const cantidadInput = document.querySelector('#pedir_cantidad');
 
     if (!cantidadInput) {
-        return; // Si no existe el input, salimos de la función
+        return; 
     }
 
     if (sumarBtn) {

@@ -6,7 +6,6 @@ const formModificar = document.getElementById('modificarForm');
 const inputCantidadNueva = document.getElementById('cantidadNueva');
 const inputHerramientaId = document.getElementById('herramientaId');
 
-// Renderizar herramientas
 function renderizarHerramientas() {
     contenedorHerramientas.innerHTML = '';
     pedidos.forEach(herramienta => {
@@ -36,7 +35,6 @@ function renderizarHerramientas() {
     });
 }
 
-// Abrir modal para modificar cantidad
 function abrirModalModificar(id) {
     const herramienta = pedidos.find(h => h.id === id);
     inputHerramientaId.value = id;
@@ -44,25 +42,21 @@ function abrirModalModificar(id) {
     modal.style.display = 'block';
 }
 
-// Cerrar modal
 closeModal.onclick = () => {
     modal.style.display = 'none';
 };
 
-// Función para eliminar herramienta
 function eliminarHerramienta(id) {
     pedidos = pedidos.filter(h => h.id !== id);
     localStorage.setItem('pedidos', JSON.stringify(pedidos));
     renderizarHerramientas();
 }
 
-// Guardar cambios de cantidad pedida
 formModificar.onsubmit = function (event) {
     event.preventDefault();
     const id = inputHerramientaId.value;
     const nuevaCantidad = inputCantidadNueva.value;
 
-    // Actualizar la cantidad pedida en el array
     pedidos = pedidos.map(h => {
         if (h.id === id) {
             h.pedirCantidad = nuevaCantidad;
@@ -70,13 +64,10 @@ formModificar.onsubmit = function (event) {
         return h;
     });
 
-    // Guardar en localStorage
     localStorage.setItem('pedidos', JSON.stringify(pedidos));
 
-    // Cerrar modal y volver a renderizar
     modal.style.display = 'none';
     renderizarHerramientas();
 };
 
-// Renderizar herramientas al cargar la página
 renderizarHerramientas();

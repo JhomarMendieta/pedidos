@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', function () {
     obtenerTodosLosPedidos();
-    obtenerEstadosPedidos();  // Cargar los estados al cargar la página
+    obtenerEstadosPedidos(); 
 });
 
-let estadosGlobales = [];  // Aquí almacenaremos los estados obtenidos
+let estadosGlobales = []; 
 
 function obtenerTodosLosPedidos() {
     fetch('http://127.0.0.1:5000/obtener_pedidos')
@@ -13,21 +13,20 @@ function obtenerTodosLosPedidos() {
 }
 
 function obtenerEstadosPedidos() {
-    fetch('http://127.0.0.1:5000/obtener_estados_pedidos')  // Usamos el nuevo endpoint
+    fetch('http://127.0.0.1:5000/obtener_estados_pedidos') 
         .then(response => response.json())
         .then(data => {
-            estadosGlobales = data;  // Guardamos los estados globalmente
+            estadosGlobales = data;  
         })
         .catch(error => console.error('Error al obtener los estados:', error));
 }
 
 function mostrarPedidos(pedidos) {
     const contenedor = document.getElementById('contenedor-tu-pedido');
-    contenedor.innerHTML = ''; // Limpiar el contenedor antes de agregar nuevos elementos
+    contenedor.innerHTML = '';
 
     pedidos.forEach(pedido => {
         console.log(pedido)
-        // Crear el HTML para cada pedido
         const pedidoHTML = `
         <div class="contenedor-tu-pedido">
             <div class="estado">
@@ -54,14 +53,13 @@ function mostrarPedidos(pedidos) {
                     `).join('')}
                 </div>
                 <p class="usuario">Usuario: ${pedido.nombre_usuario}</p>
-                <p class="nPedido">N° pedido: ${pedido.id_pedido}</p> <!-- Mostrar el número de pedido -->
+                <p class="nPedido">N° pedido: ${pedido.id_pedido}</p>
                 <p class="fecha">Fecha: ${pedido.fecha}</p>
                 <p class="hora">Hora: ${pedido.hora}</p>
             </div>
         </div>
         `;
 
-        // Crear un contenedor para el pedido y agregarlo al HTML
         const pedidoContenedor = document.createElement('div');
         pedidoContenedor.classList.add('pedido');
         pedidoContenedor.innerHTML = pedidoHTML;
@@ -69,7 +67,6 @@ function mostrarPedidos(pedidos) {
     });
 }
 
-// Función para cambiar el estado de un pedido
 function cambiarEstado(pedidoId) {
     const selectEstado = document.getElementById(`cambiar_estado_${pedidoId}`);
     const nuevoEstadoId = selectEstado.value;

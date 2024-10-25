@@ -42,14 +42,12 @@ async function obtenerHerramientas(query = '') {
     }
 }
 
-// Llamar a la función obtenerHerramientas sin parámetro para mostrar todas las herramientas al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
-    obtenerHerramientas();  // Esto hará que se carguen todas las herramientas al inicio
+    obtenerHerramientas(); 
 });
 
-// Función para manejar el evento de búsqueda
 function buscarHerramientas(event) {
-    event.preventDefault();  // Prevenir el envío del formulario
-    const query = document.getElementById('search-input').value;  // Obtener el valor del input de búsqueda
-    obtenerHerramientas(query);  // Llamar a la función con el parámetro de búsqueda
+    event.preventDefault();  
+    const query = document.getElementById('search-input').value;  
+    obtenerHerramientas(query);  
 }

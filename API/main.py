@@ -429,7 +429,6 @@ def datos_herramienta_pedidos():
 
     with mysql.connection.cursor(MySQLdb.cursors.DictCursor) as cursor:
         if query:
-            # Filtrar por nombre de la herramienta
             cursor.execute(f"""
                 SELECT h.id, 
                        h.imagen, 
@@ -445,7 +444,6 @@ def datos_herramienta_pedidos():
                 WHERE th.nombre LIKE %s
             """, (f"%{query}%",))
         else:
-            # Si no hay búsqueda, devolver todas las herramientas
             cursor.execute("""
                 SELECT h.id, 
                        h.imagen, 
@@ -462,7 +460,6 @@ def datos_herramienta_pedidos():
 
         datos_herramienta_pedidos = cursor.fetchall()
 
-    # Verificar si hay resultados
     if datos_herramienta_pedidos:
         return jsonify(datos_herramienta_pedidos), 200
     else:
@@ -473,23 +470,21 @@ def enviar_pedido():
     try:
         data = request.json
 
-        usuario_fk = int(data['usuario_fk'])  # Asegurarse de que sea entero
-        fecha = data['fecha']  # Validar el formato de fecha si es necesario
-        horario = data['horario']  # Validar formato de horario
-        estado_fk = int(data['estado_fk'])  # Asegurarse de que sea entero
-        tipo_pedido = int(data['tipo_pedido'])  # Asegurarse de que sea entero
+        usuario_fk = int(data['usuario_fk'])  
+        fecha = data['fecha']  
+        horario = data['horario'] 
+        estado_fk = int(data['estado_fk'])  
+        tipo_pedido = int(data['tipo_pedido']) 
         herramientas = data['herramientas']
 
-        # Insertar datos en la tabla `pedidos`
         cursor = mysql.connection.cursor()
         query_pedidos = """
         INSERT INTO pedidos (usuario_fk, fecha, horario, estado_fk, tipo_pedido) 
         VALUES (%s, %s, %s, %s, %s)
         """
         cursor.execute(query_pedidos, (usuario_fk, fecha, horario, estado_fk, tipo_pedido))
-        pedido_id = cursor.lastrowid  # Obtiene el ID del pedido insertado
+        pedido_id = cursor.lastrowid 
 
-        # Luego, insertar en `pedidos_herramientas`
         query_pedidos_herramientas = """
         INSERT INTO pedido_herramientas (pedido_id_fk, herramienta_id_fk, cantidad)
         VALUES (%s, %s, %s)
@@ -499,10 +494,10 @@ def enviar_pedido():
                 cursor.execute(query_pedidos_herramientas, (pedido_id, int(herramienta['herramienta_id_fk']), int(herramienta['cantidad'])))
         except Exception as e:
             print(f"Error al insertar herramienta: {e}")
-            mysql.connection.rollback()  # Hacer rollback en caso de error
+            mysql.connection.rollback() 
             return jsonify({'error': 'Error al insertar herramientas'}), 500
 
-        mysql.connection.commit()  # Confirmar todos los cambios
+        mysql.connection.commit() 
         cursor.close()
 
         return jsonify({'message': 'Pedido enviado correctamente'}), 201
@@ -539,13 +534,12 @@ def obtener_pedidos_usuario():
         for pedido in datos_pedidos:
             pedido_id = pedido['id']
             if pedido_id not in pedidos_dict:
-                # Convertir la hora (timedelta) a una cadena antes de enviarla
                 hora = str(pedido['horario']) if isinstance(pedido['horario'], timedelta) else pedido['horario']
 
                 pedidos_dict[pedido_id] = {
                     "estado": pedido['estado'],
-                    "fecha": pedido['fecha'].strftime("%Y-%m-%d"),  # Convertir fecha a cadena
-                    "hora": hora,  # Hora serializada a cadena
+                    "fecha": pedido['fecha'].strftime("%Y-%m-%d"), 
+                    "hora": hora, 
                     "herramientas": []
                 }
             pedidos_dict[pedido_id]["herramientas"].append({
@@ -564,7 +558,6 @@ def obtener_pedidos_usuario():
 @app.route('/obtener_pedidos', methods=['GET'])
 def obtener_pedidos():
     try:
-        # Conexión y consulta SQL para obtener todos los pedidos
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         consulta = '''
         SELECT  pedidos.id AS id_pedido, pedidos.fecha, pedidos.horario, estado.estado, 
@@ -585,13 +578,12 @@ def obtener_pedidos():
         for pedido in datos_pedidos:
             pedido_id = pedido['id_pedido']
             if pedido_id not in pedidos_dict:
-                # Convertir la hora (timedelta) a una cadena antes de enviarla
                 hora = str(pedido['horario']) if isinstance(pedido['horario'], timedelta) else pedido['horario']
 
                 pedidos_dict[pedido_id] = {
                     "estado": pedido['estado'],
-                    "fecha": pedido['fecha'].strftime("%Y-%m-%d"),  # Convertir fecha a cadena
-                    "hora": hora,  # Hora serializada a cadena
+                    "fecha": pedido['fecha'].strftime("%Y-%m-%d"), 
+                    "hora": hora,  
                     "herramientas": []
                 }
             pedidos_dict[pedido_id]["herramientas"].append({
@@ -627,7 +619,6 @@ def modificar_herramienta_pedido():
 
         cursor = mysql.connection.cursor()
 
-        # Consulta corregida: Mencionar las columnas de la tabla y proporcionar los valores correctos
         query = """
         INSERT INTO historica_herramientas (
             id, pedido_id_fk, herramienta_id_fk, usuario_fk, 
@@ -650,13 +641,11 @@ def modificar_herramienta_pedido():
 @app.route('/obtener_estados_pedidos', methods=['GET'])
 def obtener_estados_pedidos():
     try:
-        # Conexión y consulta SQL
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         consulta = 'SELECT estado.id, estado.estado FROM estado'
         cursor.execute(consulta)
         estados = cursor.fetchall()
 
-        # Convertir los resultados a JSON y cerrar el cursor
         cursor.close()
         return jsonify(estados)
     except Exception as e:
