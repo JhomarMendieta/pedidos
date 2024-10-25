@@ -422,6 +422,27 @@ def eliminar_categoria():
 #########################################################################################################
 #pedidos
 
+@app.route('/contador', methods=['POST'])
+def contador():
+    data = request.json
+
+    id_herramienta = int(data['id'])  
+    cantidad = int(data['pedirCantidad'])  
+    
+    cursor = mysql.connection.cursor()
+    query_pedidos = """
+    UPDATE tipos_herramienta 
+    SET disponibles = disponibles - %s 
+    WHERE id = %s;
+    """
+    cursor.execute(query_pedidos, (cantidad, id_herramienta))  # Cambié el orden aquí
+
+    mysql.connection.commit() 
+
+    cursor.close()
+
+    return jsonify({'message': 'Pedido enviado correctamente'}), 201
+
 
 @app.route('/datos_herramienta_pedidos', methods=['GET'])
 def datos_herramienta_pedidos():

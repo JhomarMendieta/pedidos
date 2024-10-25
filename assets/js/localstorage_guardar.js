@@ -63,7 +63,27 @@ document.querySelector('.modal-añadir').addEventListener('click', function () {
         cantidadDisponible: parseInt(document.querySelector('.modal-cantidad').textContent.split(': ')[1]),
         pedirCantidad: parseInt(document.getElementById('pedir_cantidad').value),
     };
-
+   
+    fetch('http://localhost:5000/contador', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nuevaHerramienta)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert('herramienta restada');
+            añadirAlPedido(nuevaHerramienta);
+            localStorage.removeItem('pedidos');  
+            actualizarVisibilidadBoton();
+        } else {
+            alert('Error al restar una herramienta');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error en el servidor.');
+    });
     añadirAlPedido(nuevaHerramienta);
     cerrarModal();
 });
