@@ -1,15 +1,8 @@
 function crearHerramientaHTML(herramienta) {
     return `
-        <div class="herramienta" onclick="mostrarModal('${herramienta.id}', '${herramienta.imagen}', '${herramienta.nombre}', '${herramienta.categoria_nombre}', '${herramienta.subcategoria_nombre}', ${herramienta.consumible}, ${herramienta.disponibles})">
-            <div class="img">
-                <i class="fa-solid fa-image"></i>
-            </div>
-            <div class="datos">
-                <p class="nombre-herramienta">${herramienta.nombre}</p>
-            </div>
-            <div class="cantidad">
-                <p>Cant. disponible: ${herramienta.disponibles}</p>
-            </div>
+        <div class="herramienta">
+            <p>${herramienta.nombre}</p>
+            <button class="mostralModal" onclick="mostrarModal('${herramienta.id}', '${herramienta.imagen}', '${herramienta.nombre}', '${herramienta.categoria_nombre}', '${herramienta.subcategoria_nombre}', ${herramienta.consumible}, ${herramienta.disponibles})"></button>
         </div>
     `;
 }
@@ -43,11 +36,11 @@ async function obtenerHerramientas(query = '') {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    obtenerHerramientas(); 
+    obtenerHerramientas();
 });
 
 function buscarHerramientas(event) {
-    event.preventDefault();  
-    const query = document.getElementById('search-input').value;  
-    obtenerHerramientas(query);  
+    event.preventDefault();
+    const query = document.getElementById('search-input').value;
+    obtenerHerramientas(query);
 }

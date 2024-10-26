@@ -525,7 +525,7 @@ def obtener_pedidos_usuario():
         INNER JOIN herramientas ON herramientas.id = pedido_herramientas.herramienta_id_fk
         INNER JOIN tipos_herramienta ON tipos_herramienta.id = herramientas.tipo_id
         WHERE usuarios.id = %s
-        ORDER BY pedidos.id
+        ORDER BY pedidos.id DESC
         '''
         cursor.execute(consulta, (usuario_id,))
         datos_pedidos = cursor.fetchall()
@@ -651,6 +651,9 @@ def obtener_estados_pedidos():
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
+    
+
+# @app.route('/actualizar_estado', methods=['UPDATE'])
 
 
 if __name__ == '__main__':

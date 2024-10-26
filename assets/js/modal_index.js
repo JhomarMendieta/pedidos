@@ -8,6 +8,7 @@ function mostrarModal(id, imagen, nombre, categoria_nombre, subcategoria_nombre,
     const consumibleHerramienta = document.querySelector(".modal-consumible");
     const cantidadHerramienta = document.querySelector(".modal-cantidad");
     const cantidadInput = document.querySelector('#pedir_cantidad');
+    const cerrarModal = document.getElementById('cerrar-modal');
 
     imgHerramienta.src = imagen || 'ruta_imagen_predeterminada';
     nombreHerramienta.textContent = nombre;
@@ -21,4 +22,8 @@ function mostrarModal(id, imagen, nombre, categoria_nombre, subcategoria_nombre,
     cantidadInput.setAttribute('max', cantidad);
 
     modal.style.display = "block";
+
+    cerrarModal.addEventListener('click', () => {
+        modal.style.display = "none";
+    }); 
 }
