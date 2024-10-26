@@ -82,7 +82,7 @@ def recibir_mensaje():
                     if herramienta and cantidad_pedida <= herramienta['cantidad']:
                         response = {
                         "response":[
-                            f"Está seguro que quiere pedir Herramienta: {herramienta['nombre']}<br> Cantidad: {cantidad_pedida}?<br>- <a onclick=\"enviartexto('confirmar pedido')\">Confirmar pedido</a><br>- <a onclick=\"enviartexto('elegir otra cantidad')\">Elegir otra cantidad</a>",
+                            f"Está seguro que quiere pedir Herramienta: {herramienta['nombre']} {herramienta['id']}<br> Cantidad: {cantidad_pedida}?<br>- <a onclick=\"enviartexto('confirmar pedido')\">Confirmar pedido</a><br>- <a onclick=\"enviartexto('elegir otra cantidad')\">Elegir otra cantidad</a>",
                             "confirmar",
                             herramienta,
                             cantidad_pedida
@@ -106,19 +106,38 @@ def recibir_mensaje():
         
         elif step == "confirmar" and mensaje == "confirmar pedido":
             if herramienta_seleccionada and cantidad_pedida:
-                usuario_fk = id_usuario  # Asegúrate de que id_usuario esté definido
-                fecha = datetime.now()  # Obtener la fecha actual
-                estado_fk = herramienta_seleccionada["id"]
+                #usuario_fk = id_usuario  
+                #fecha = datetime.now()  
+                #estado_fk = herramienta_seleccionada["id"]
 
-                cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-                # Corregir la consulta SQL: falta una coma entre `estado_fk` y `cantidad_solicitada`
-                cursor.execute("INSERT INTO pedidos (usuario_fk, fecha, estado_fk) VALUES (%s, %s, %s)",
-                            (usuario_fk, fecha, estado_fk))
+                #cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+              
+                #cursor.execute("INSERT INTO pedidos (usuario_fk, fecha, estado_fk) VALUES (%s, %s, %s)",
+                #            (usuario_fk, fecha, estado_fk))
                 
-                mysql.connection.commit()  # Confirmar los cambios en la base de datos
-                cursor.close()  # Cerrar el cursor
-                
-                # Respuesta al cliente
+                #usuario_fk = int(id_usuario)  
+                usuario_fk = 1 
+                fecha = datetime.today() 
+                horario = datetime.now() 
+                estado_fk = 1 
+                tipo_pedido = 1
+                herramientas = herramienta_seleccionada["id"]
+
+                cursor = mysql.connection.cursor()
+                query_pedidos = """
+                INSERT INTO pedidos (usuario_fk, fecha, horario, estado_fk, tipo_pedido) 
+                VALUES (%s, %s, %s, %s, %s)
+                """
+                cursor.execute(query_pedidos, (usuario_fk, fecha, horario, estado_fk, tipo_pedido))
+                pedido_id = cursor.lastrowid 
+
+                query_pedidos_herramientas = """
+                INSERT INTO pedido_herramientas (pedido_id_fk, herramienta_id_fk, cantidad)
+                VALUES (%s, %s, %s)
+                """
+                mysql.connection.commit() 
+                cursor.close()  
+    
                 response = {
                     "response": [
                         f"Pedido completado: {herramienta_seleccionada['nombre']}<br> Cantidad: {cantidad_pedida}. Gracias por utilizar este servicio",

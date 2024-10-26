@@ -11,7 +11,7 @@ CORS(app)
 # Configuración de la base de datos MySQL
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'panol'
+app.config['MYSQL_DB'] = 'panol2'
 app.config['MYSQL_HOST'] = 'localhost'
 
 mysql = MySQL(app)
@@ -422,6 +422,27 @@ def eliminar_categoria():
 #########################################################################################################
 #pedidos
 
+@app.route('/contador', methods=['POST'])
+def contador():
+    data = request.json
+
+    id_herramienta = int(data['id'])  
+    cantidad = int(data['pedirCantidad'])  
+    
+    cursor = mysql.connection.cursor()
+    query_pedidos = """
+    UPDATE tipos_herramienta 
+    SET disponibles = disponibles - %s 
+    WHERE id = %s;
+    """
+    cursor.execute(query_pedidos, (cantidad, id_herramienta))  # Cambié el orden aquí
+
+    mysql.connection.commit() 
+
+    cursor.close()
+
+    return jsonify({'message': 'Pedido enviado correctamente'}), 201
+
 
 @app.route('/datos_herramienta_pedidos', methods=['GET'])
 def datos_herramienta_pedidos():
@@ -652,9 +673,44 @@ def obtener_estados_pedidos():
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
     
+<<<<<<< HEAD
 
 # @app.route('/actualizar_estado', methods=['UPDATE'])
+=======
+@app.route('/actualizar_herramienta', methods=['POST'])
+def actualizar_herramienta():
+    data = request.get_json()
+    tool_id = data.get('tool_id')
+    quantity_ordered = data.get('quantity')
+>>>>>>> 6644b0335a8b157ea15195894a0d32889f65f093
 
+    if not tool_id or not quantity_ordered:
+        return jsonify({'message': 'Faltan datos necesarios'}), 400
+
+    with mysql.connection.cursor() as cursor:
+        # Check current available quantity
+        cursor.execute("""
+            SELECT disponibles FROM tipos_herramienta WHERE id = %s
+        """, (tool_id,))
+        result = cursor.fetchone()
+
+        if not result:
+            return jsonify({'message': 'Herramienta no encontrada'}), 404
+
+        available_quantity = result['disponibles']
+
+        # Check if enough tools are available
+        if available_quantity < quantity_ordered:
+            return jsonify({'message': 'No hay suficientes herramientas disponibles'}), 400
+
+        # Update the available quantity
+        new_quantity = available_quantity - quantity_ordered
+        cursor.execute("""
+            UPDATE tipos_herramienta SET disponibles = %s WHERE id = %s
+        """, (new_quantity, tool_id))
+        mysql.connection.commit()
+
+    return jsonify({'message': 'Cantidad actualizada correctamente', 'nueva_cantidad': new_quantity}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
