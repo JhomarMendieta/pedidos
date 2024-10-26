@@ -673,17 +673,13 @@ def obtener_estados_pedidos():
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
     
-<<<<<<< HEAD
 
 # @app.route('/actualizar_estado', methods=['UPDATE'])
-=======
 @app.route('/actualizar_herramienta', methods=['POST'])
 def actualizar_herramienta():
     data = request.get_json()
     tool_id = data.get('tool_id')
     quantity_ordered = data.get('quantity')
->>>>>>> 6644b0335a8b157ea15195894a0d32889f65f093
-
     if not tool_id or not quantity_ordered:
         return jsonify({'message': 'Faltan datos necesarios'}), 400
 
