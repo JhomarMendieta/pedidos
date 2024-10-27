@@ -1,0 +1,285 @@
+@app.route('/contador', methods=['POST'])
+def contador():
+    data = request.json
+
+    id_herramienta = int(data['id'])  
+    cantidad = int(data['pedirCantidad'])  
+    
+    cursor = mysql.connection.cursor()
+    query_pedidos = """
+    UPDATE tipos_herramienta 
+    SET disponibles = disponibles - %s 
+    WHERE id = %s;
+    """
+    cursor.execute(query_pedidos, (cantidad, id_herramienta))  # Cambié el orden aquí
+
+    mysql.connection.commit() 
+
+    cursor.close()
+
+    return jsonify({'message': 'Pedido enviado correctamente'}), 201
+
+
+@app.route('/datos_herramienta_pedidos', methods=['GET'])
+def datos_herramienta_pedidos():
+    query = request.args.get('query', '')
+
+    with mysql.connection.cursor(MySQLdb.cursors.DictCursor) as cursor:
+        if query:
+            cursor.execute(f"""
+                SELECT h.id, 
+                       h.imagen, 
+                       h.tipo_id,
+                       th.nombre, 
+                       th.disponibles, 
+                       sc.nombre AS subcategoria_nombre, 
+                       c.nombre AS categoria_nombre 
+                FROM herramientas h
+                INNER JOIN tipos_herramienta th ON h.tipo_id = th.id
+                INNER JOIN subcategorias sc ON th.subcategoria_id = sc.id
+                INNER JOIN categorias c ON sc.categoria_id = c.id
+                WHERE th.nombre LIKE %s
+            """, (f"%{query}%",))
+        else:
+            cursor.execute("""
+                SELECT h.id, 
+                       h.imagen, 
+                       h.tipo_id,
+                       th.nombre, 
+                       th.disponibles, 
+                       sc.nombre AS subcategoria_nombre, 
+                       c.nombre AS categoria_nombre 
+                FROM herramientas h
+                INNER JOIN tipos_herramienta th ON h.tipo_id = th.id
+                INNER JOIN subcategorias sc ON th.subcategoria_id = sc.id
+                INNER JOIN categorias c ON sc.categoria_id = c.id
+            """)
+
+        datos_herramienta_pedidos = cursor.fetchall()
+
+    if datos_herramienta_pedidos:
+        return jsonify(datos_herramienta_pedidos), 200
+    else:
+        return jsonify({'message': 'No se encontraron herramientas'}), 404
+
+@app.route('/enviar_pedido', methods=['POST'])
+def enviar_pedido():
+    try:
+        data = request.json
+
+        usuario_fk = int(data['usuario_fk'])  
+        fecha = data['fecha']  
+        horario = data['horario'] 
+        estado_fk = int(data['estado_fk'])  
+        tipo_pedido = int(data['tipo_pedido']) 
+        herramientas = data['herramientas']
+
+        cursor = mysql.connection.cursor()
+        query_pedidos = """
+        INSERT INTO pedidos (usuario_fk, fecha, horario, estado_fk, tipo_pedido) 
+        VALUES (%s, %s, %s, %s, %s)
+        """
+        cursor.execute(query_pedidos, (usuario_fk, fecha, horario, estado_fk, tipo_pedido))
+        pedido_id = cursor.lastrowid 
+
+        query_pedidos_herramientas = """
+        INSERT INTO pedido_herramientas (pedido_id_fk, herramienta_id_fk, cantidad)
+        VALUES (%s, %s, %s)
+        """
+        try:
+            for herramienta in herramientas:
+                cursor.execute(query_pedidos_herramientas, (pedido_id, int(herramienta['herramienta_id_fk']), int(herramienta['cantidad'])))
+        except Exception as e:
+            print(f"Error al insertar herramienta: {e}")
+            mysql.connection.rollback() 
+            return jsonify({'error': 'Error al insertar herramientas'}), 500
+
+        mysql.connection.commit() 
+        cursor.close()
+
+        return jsonify({'message': 'Pedido enviado correctamente'}), 201
+
+    except KeyError as e:
+        print(f"Clave faltante: {e}")
+        return jsonify({'error': f'Falta clave {str(e)}'}), 400
+    except Exception as e:
+        print(f"Error en el servidor: {e}")
+        return jsonify({'error': 'Error en el servidor'}), 500
+    
+
+@app.route('/obtener_pedidos_usuario', methods=['GET'])
+def obtener_pedidos_usuario():
+    try:
+        usuario_id = request.args.get('usuario_id')
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        consulta = '''
+        SELECT pedidos.id, pedidos.fecha, pedidos.horario, estado.estado, 
+               pedido_herramientas.cantidad, tipos_herramienta.nombre 
+        FROM pedidos
+        INNER JOIN usuarios ON usuarios.id = pedidos.usuario_fk
+        INNER JOIN estado ON pedidos.estado_fk = estado.id
+        INNER JOIN pedido_herramientas ON pedido_herramientas.pedido_id_fk = pedidos.id
+        INNER JOIN herramientas ON herramientas.id = pedido_herramientas.herramienta_id_fk
+        INNER JOIN tipos_herramienta ON tipos_herramienta.id = herramientas.tipo_id
+        WHERE usuarios.id = %s
+        ORDER BY pedidos.id DESC
+        '''
+        cursor.execute(consulta, (usuario_id,))
+        datos_pedidos = cursor.fetchall()
+
+        pedidos_dict = {}
+        for pedido in datos_pedidos:
+            pedido_id = pedido['id']
+            if pedido_id not in pedidos_dict:
+                hora = str(pedido['horario']) if isinstance(pedido['horario'], timedelta) else pedido['horario']
+
+                pedidos_dict[pedido_id] = {
+                    "estado": pedido['estado'],
+                    "fecha": pedido['fecha'].strftime("%Y-%m-%d"), 
+                    "hora": hora, 
+                    "herramientas": []
+                }
+            pedidos_dict[pedido_id]["herramientas"].append({
+                "nombre": pedido['nombre'],
+                "cantidad": pedido['cantidad']
+            })
+
+        resultado = list(pedidos_dict.values())
+        cursor.close()
+        return jsonify(resultado)
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/obtener_pedidos', methods=['GET'])
+def obtener_pedidos():
+    try:
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        consulta = '''
+        SELECT  pedidos.id AS id_pedido, pedidos.fecha, pedidos.horario, estado.estado, 
+                pedido_herramientas.cantidad, tipos_herramienta.nombre,
+                usuarios.nombre AS nombre_usuario
+        FROM pedidos
+        INNER JOIN usuarios ON usuarios.id = pedidos.usuario_fk
+        INNER JOIN estado ON pedidos.estado_fk = estado.id
+        INNER JOIN pedido_herramientas ON pedido_herramientas.pedido_id_fk = pedidos.id
+        INNER JOIN herramientas ON herramientas.id = pedido_herramientas.herramienta_id_fk
+        INNER JOIN tipos_herramienta ON tipos_herramienta.id = herramientas.tipo_id
+        ORDER BY pedidos.id
+        '''
+        cursor.execute(consulta)
+        datos_pedidos = cursor.fetchall()
+
+        pedidos_dict = {}
+        for pedido in datos_pedidos:
+            pedido_id = pedido['id_pedido']
+            if pedido_id not in pedidos_dict:
+                hora = str(pedido['horario']) if isinstance(pedido['horario'], timedelta) else pedido['horario']
+
+                pedidos_dict[pedido_id] = {
+                    "estado": pedido['estado'],
+                    "fecha": pedido['fecha'].strftime("%Y-%m-%d"), 
+                    "hora": hora,  
+                    "herramientas": []
+                }
+            pedidos_dict[pedido_id]["herramientas"].append({
+                "nombre": pedido['nombre'],
+                "cantidad": pedido['cantidad']
+            })
+
+        resultado = list(pedidos_dict.values())
+        cursor.close()
+        return jsonify(resultado)
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+    
+
+@app.route('/historica_herramientas', methods=['POST'])
+def modificar_herramienta_pedido():
+    try:
+        data = request.json
+
+        id = data['id']
+        pedido_id_fk = data['pedido_id_fk']
+        herramienta_id_fk = data['herramienta_id_fk']
+        usuario_fk = data['usuario_fk']
+        fecha_entrega = data['fecha_entrega']   
+        fecha_devolucion = data['fecha_devolucion']
+        horario_entrega = data['horario_entrega']
+        horario_devolucion = data['horario_devolucion']
+        cantidad = data['cantidad']
+        estado_fk = data['estado_fk']
+        observaciones = data['observaciones']
+
+        cursor = mysql.connection.cursor()
+
+        query = """
+        INSERT INTO historica_herramientas (
+            id, pedido_id_fk, herramienta_id_fk, usuario_fk, 
+            fecha_entrega, fecha_devolucion, horario_entrega, 
+            horario_devolucion, cantidad, estado_fk, observaciones
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        values = (id, pedido_id_fk, herramienta_id_fk, usuario_fk, fecha_entrega, fecha_devolucion, horario_entrega, horario_devolucion, cantidad, estado_fk, observaciones)
+        cursor.execute(query, values)
+
+        mysql.connection.commit()
+        cursor.close() 
+
+        return jsonify({'message': 'Historial insertado correctamente'}), 201
+    
+    except Exception as e:
+        print(f"Error al insertar historial: {e}")
+        return jsonify({'error': 'Error al insertar historial'}), 500
+
+@app.route('/obtener_estados_pedidos', methods=['GET'])
+def obtener_estados_pedidos():
+    try:
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        consulta = 'SELECT estado.id, estado.estado FROM estado'
+        cursor.execute(consulta)
+        estados = cursor.fetchall()
+
+        cursor.close()
+        return jsonify(estados)
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
+    
+
+# @app.route('/actualizar_estado', methods=['UPDATE'])
+@app.route('/actualizar_herramienta', methods=['POST'])
+def actualizar_herramienta():
+    data = request.get_json()
+    tool_id = data.get('tool_id')
+    quantity_ordered = data.get('quantity')
+    if not tool_id or not quantity_ordered:
+        return jsonify({'message': 'Faltan datos necesarios'}), 400
+
+    with mysql.connection.cursor() as cursor:
+        # Check current available quantity
+        cursor.execute("""
+            SELECT disponibles FROM tipos_herramienta WHERE id = %s
+        """, (tool_id,))
+        result = cursor.fetchone()
+
+        if not result:
+            return jsonify({'message': 'Herramienta no encontrada'}), 404
+
+        available_quantity = result['disponibles']
+
+        # Check if enough tools are available
+        if available_quantity < quantity_ordered:
+            return jsonify({'message': 'No hay suficientes herramientas disponibles'}), 400
+
+        # Update the available quantity
+        new_quantity = available_quantity - quantity_ordered
+        cursor.execute("""
+            UPDATE tipos_herramienta SET disponibles = %s WHERE id = %s
+        """, (new_quantity, tool_id))
+        mysql.connection.commit()
+
+    return jsonify({'message': 'Cantidad actualizada correctamente', 'nueva_cantidad': new_quantity}), 200

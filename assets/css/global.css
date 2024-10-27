@@ -1,6 +1,10 @@
 :root {
     /* Colores */
-    --negro: #fff;
+    --fondo: #fff;
+    --objetos: #f8f8f8;
+    --objetosOscuro: #e8ecee;
+    --objetosOscurosMas: #6c747e;
+    --borde: #dfdfdf;
 
     /* Colores */
     --btn-red: #e80000;
