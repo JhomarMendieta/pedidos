@@ -28,30 +28,24 @@ function mostrarModal(id, imagen, nombre, categoria_nombre, subcategoria_nombre,
         </div>
     `;
 
-    // Insertar el contenido generado en el modal
     modal.innerHTML = modalContent;
     modal.style.display = "block";
 
-    // Obtener los elementos del modal
     const cerrarModal = modal.querySelector('#cerrar-modal');
     const botonAñadir = modal.querySelector('.modal-añadir');
     const botonCancelar = modal.querySelector('.modal-cancelar');
     const cantidadInput = modal.querySelector('#pedir_cantidad');
 
-    // Eventos para cerrar el modal
     cerrarModal.addEventListener('click', () => {
         modal.style.display = "none";
     });
 
-    // Agregar funcionalidad al botón "Añadir al pedido"
     botonAñadir.onclick = () => {
         const cantidadSeleccionada = cantidadInput.value;
-        // Aquí puedes implementar la lógica para añadir al pedido
         alert(`Añadido ${cantidadSeleccionada} unidades de ${nombre}`);
-        modal.style.display = "none"; // Cerrar el modal tras añadir
+        modal.style.display = "none";
     };
 
-    // Funcionalidad para el botón "Cancelar"
     botonCancelar.onclick = () => {
         modal.style.display = "none";
     };

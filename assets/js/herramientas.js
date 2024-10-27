@@ -81,7 +81,7 @@ function buscarHerramientas(event) {
     event.preventDefault();
     const query = document.getElementById('buscar-herramieta').value;
     const categoriaId = document.getElementById('categoria-select').value;
-    const subcategoriaId = document.getElementById('subcategoria-select').value; // Nuevo parámetroc
+    const subcategoriaId = document.getElementById('subcategoria-select').value;
     const tipoId = document.getElementById('tipo-herramienta-select').value;
     obtenerHerramientas(query, categoriaId, subcategoriaId, tipoId);
 }
@@ -91,7 +91,7 @@ function buscarConsumibles(event) {
     event.preventDefault();
     const query = document.getElementById('buscar-consumible').value;
     const categoriaId = document.getElementById('categoria-select').value;
-    const subcategoriaId = document.getElementById('subcategoria-select').value; // Nuevo parámetro
+    const subcategoriaId = document.getElementById('subcategoria-select').value;
     obtenerConsumibles(query, categoriaId, subcategoriaId);
 }
 

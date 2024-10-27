@@ -434,8 +434,8 @@ def eliminar_categoria():
 def obtener_herramientas():
     query = request.args.get('query', '')
     categoria_id = request.args.get('categoria_id', None)  
-    subcategoria_id = request.args.get('subcategoria_id', None)  # Nuevo parámetro
-    tipo_id = request.args.get('tipo_id', None)  # Nuevo parámetro
+    subcategoria_id = request.args.get('subcategoria_id', None) 
+    tipo_id = request.args.get('tipo_id', None) 
 
     with mysql.connection.cursor(MySQLdb.cursors.DictCursor) as cursor:
         base_query = """
@@ -455,6 +455,7 @@ def obtener_herramientas():
         conditions = []
         params = []
 
+        # Condicionales para filtrar por nombre, categoría y subcategoría
         if query:
             conditions.append("thrm.nombre LIKE %s")
             params.append(f"%{query}%")
@@ -462,10 +463,10 @@ def obtener_herramientas():
             conditions.append("ctr.id = %s")
             params.append(categoria_id)
         if subcategoria_id:
-            conditions.append("sctr.id = %s")  # Filtrar por subcategoría
+            conditions.append("sctr.id = %s") 
             params.append(subcategoria_id)
         if tipo_id:
-            conditions.append("thrm.id = %s")  # Filtrar por tipo
+            conditions.append("thrm.id = %s")
             params.append(tipo_id)
 
         if conditions:
@@ -482,8 +483,8 @@ def obtener_herramientas():
 @app.route('/obtener_consumibles', methods=['GET'])
 def obtener_consumibles():
     query = request.args.get('query', '')
-    categoria_id = request.args.get('categoria_id', None)  # Nuevo parámetro para categoría
-    subcategoria_id = request.args.get('subcategoria_id', None)  # Nuevo parámetro para subcategoría
+    categoria_id = request.args.get('categoria_id', None) 
+    subcategoria_id = request.args.get('subcategoria_id', None) 
 
     with mysql.connection.cursor(MySQLdb.cursors.DictCursor) as cursor:
         base_query = """
@@ -507,10 +508,10 @@ def obtener_consumibles():
             conditions.append("csm.nombre LIKE %s")
             params.append(f"%{query}%")
         if categoria_id:
-            conditions.append("ctr.id = %s")  # Filtrar por categoría
+            conditions.append("ctr.id = %s") 
             params.append(categoria_id)
         if subcategoria_id:
-            conditions.append("sctr.id = %s")  # Filtrar por subcategoría
+            conditions.append("sctr.id = %s") 
             params.append(subcategoria_id)
 
         if conditions:
