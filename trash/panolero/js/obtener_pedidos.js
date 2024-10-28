@@ -31,7 +31,7 @@ function mostrarPedidos(pedidos) {
                     ${pedido.estado === "Cancelado" ? 
                         '<button style="background-color:red;"><p>Pedido Cancelado</p></button>' 
                         : pedido.estado === "Devuelto" ? 
-                        '<button style="background-color:red;"> <p>Pedido Devuelto</p></button>' 
+                        '<button style="background-color:green;"> <p>Pedido Devuelto</p></button>' 
                         : `
                         <select id="cambiar_estado_${pedido.id_pedido}">
                             ${estadosGlobales.map(estado => `
