@@ -583,12 +583,13 @@ def cambiar_estado_pedido():
 
         # Acción adicional si el estado es "cancelado" o "devuelto"
         if estado_nombre in ["Cancelado", "Devuelto"]:
-            for consumible in consumibles_list:  # Usar la lista de consumibles
-                print(consumible)  # Imprimir consumible
-                cursor.execute(
-                    "UPDATE consumibles SET cantidad = cantidad + %s WHERE id = %s AND cantidad >= %s",
-                    (1, consumible["consumible_id_fk"], 1)  # Asegúrate de usar la cantidad correcta
-                )
+            if estado_nombre in ["Cancelado"]:
+                for consumible in consumibles_list:  # Usar la lista de consumibles
+                    print(consumible)  # Imprimir consumible
+                    cursor.execute(
+                        "UPDATE consumibles SET cantidad = cantidad + %s WHERE id = %s AND cantidad >= %s",
+                        (1, consumible["consumible_id_fk"], 1)  # Asegúrate de usar la cantidad correcta
+                    )
 
             for herramienta in herramientas_list:  # Usar la lista de herramientas
                 print(herramienta)  # Imprimir herramienta
