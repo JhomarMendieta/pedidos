@@ -12,7 +12,7 @@ CORS(app)
 # Configuración de la base de datos MySQL
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'panol'
+app.config['MYSQL_DB'] = 'panol2'
 app.config['MYSQL_HOST'] = 'localhost'
 
 mysql = MySQL(app)
@@ -520,8 +520,94 @@ def obtener_estados_pedidos():
 
 
 
+@app.route('/cambiar_estado_pedido', methods=['POST'])
+def cambiar_estado_pedido():
+    try:
+        # Obtener los datos del JSON en el cuerpo de la solicitud
+        datos = request.get_json()
+        pedido_id = datos.get('pedido_id')
+        estado_id = datos.get('estado_id')
+        
+        if not pedido_id or not estado_id:
+            return jsonify({"error": "Faltan datos requeridos"}), 400
+        
+        # Conectar a la base de datos y actualizar el estado del pedido
+        cursor = mysql.connection.cursor()
+        
+        # Consulta para obtener el nombre del estado (cancelado, devuelto, etc.)
+        cursor.execute("SELECT estado FROM estado WHERE id = %s", (estado_id,))
+        estado = cursor.fetchone()  # Devuelve una tupla
+        
+        # Si estado es None, significa que no se encontró el estado
+        if estado is None:
+            return jsonify({"error": "Estado no encontrado"}), 404
+            
+        estado_nombre = estado[0]  # Accede al primer elemento de la tupla
+        
+        # Ejecutar la consulta para obtener los detalles del pedido
+        cursor.execute("""SELECT *
+            FROM pedido_consumibles pc
+            LEFT JOIN pedido_herramientas ph ON pc.pedido_id_fk = ph.pedido_id_fk
+            WHERE pc.pedido_id_fk = %s""", (pedido_id,))
+        
+        # Obtener los nombres de las columnas
+        nombres_campos = [i[0] for i in cursor.description]  # Obtener los nombres de las columnas
+        herramientas = cursor.fetchall()  # Obtener todos los resultados
+        
+        # Separar los resultados en consumibles y herramientas
+        consumibles_list = []
+        herramientas_list = []
 
-#@app.route('/actualizar_estado', methods=['UPDATE'])
+        for fila in herramientas:
+            # Crear un diccionario para la fila actual
+            fila_dict = {nombres_campos[i]: fila[i] for i in range(len(nombres_campos))}
+
+            # Separar en consumibles y herramientas
+            if fila_dict.get('consumible_id_fk') is not None:
+                # Agregar solo los campos relevantes de consumibles
+                consumibles_list.append({
+                    'id': fila_dict['id'],
+                    'pedido_id_fk': fila_dict['pedido_id_fk'],
+                    'consumible_id_fk': fila_dict['consumible_id_fk']
+                })
+            if fila_dict.get('herramienta_id_fk') is not None:
+                # Agregar solo los campos relevantes de herramientas
+                herramientas_list.append({
+                    'cantidad': fila_dict['cantidad'],
+                    'herramienta_id_fk': fila_dict['herramienta_id_fk'],
+                    'pedido_id_fk': fila_dict['pedido_id_fk']
+                })
+
+        # Actualizar el estado del pedido
+        cursor.execute("UPDATE pedidos SET estado_fk = %s WHERE id = %s", (estado_id, pedido_id))
+
+        # Acción adicional si el estado es "cancelado" o "devuelto"
+        if estado_nombre in ["Cancelado", "Devuelto"]:
+            for consumible in consumibles_list:  # Usar la lista de consumibles
+                print(consumible)  # Imprimir consumible
+                cursor.execute(
+                    "UPDATE consumibles SET cantidad = cantidad + %s WHERE id = %s AND cantidad >= %s",
+                    (1, consumible["consumible_id_fk"], 1)  # Asegúrate de usar la cantidad correcta
+                )
+
+            for herramienta in herramientas_list:  # Usar la lista de herramientas
+                print(herramienta)  # Imprimir herramienta
+                cursor.execute(
+                    "UPDATE tipos_herramienta th JOIN herramientas h ON th.id = h.tipo_id SET th.disponibles = th.disponibles + %s WHERE h.id = %s",
+                    (herramienta["cantidad"], herramienta["herramienta_id_fk"])
+                )
+
+        # Confirmar cambios en la base de datos
+        mysql.connection.commit()
+        cursor.close()
+        
+        return jsonify({"mensaje": "Estado actualizado correctamente", 
+                        "consumibles": consumibles_list, 
+                        "herramientas": herramientas_list}), 200
+    
+    except Exception as e:
+        print(f"Error al actualizar el estado del pedido: {e}")
+        return jsonify({"error": str(e)}), 500
 
 #########################################################################################################
 #########################################################################################################

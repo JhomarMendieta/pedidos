@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
     obtenerTodosLosPedidos();
-    //obtenerEstadosPedidos(); 
 });
 
 let estadosGlobales = []; 
@@ -14,14 +13,6 @@ function obtenerTodosLosPedidos() {
         .catch(error => console.error('Error al obtener los pedidos:', error));
 }
 
-async function obtenerEstadosPedidos() {
-    await fetch('http://127.0.0.1:5000/obtener_estados_pedidos') 
-        .then(response => response.json())
-        .then(data => {
-            estadosGlobales = data;  
-        })
-        .catch(error => console.error('Error al obtener los estados:', error));
-}
 
 function mostrarPedidos(pedidos) {
     const contenedor = document.getElementById('contenedor-tu-pedido');
@@ -37,14 +28,20 @@ function mostrarPedidos(pedidos) {
                     <i class="fa-solid fa-image"></i>
                 </div>
                 <div class="contenedor_estados">
-                    <select id="cambiar_estado_${pedido.id_pedido}">
-                        ${estadosGlobales.map(estado => `
-                            <option value="${estado.id}" ${estado.estado === pedido.estado ? 'selected' : ''}>${estado.estado}</option>
-                        `).join('')}
-                    </select>
-                    <button onclick="cambiarEstado(${pedido.id_pedido})">
-                        <p>Cambiar</p>
-                    </button>
+                    ${pedido.estado === "Cancelado" ? 
+                        '<p class="estado-texto">Pedido Cancelado</p>' 
+                        : pedido.estado === "Devuelto" ? 
+                        '<p class="estado-texto">Pedido Devuelto</p>' 
+                        : `
+                        <select id="cambiar_estado_${pedido.id_pedido}">
+                            ${estadosGlobales.map(estado => `
+                                <option value="${estado.id}" ${estado.estado === pedido.estado ? 'selected' : ''}>${estado.estado}</option>
+                            `).join('')}
+                        </select>
+                        <button onclick="cambiarEstado(${pedido.id_pedido})">
+                            <p>Cambiar</p>
+                        </button>
+                    `}
                 </div>
             </div>
             <div class="datos">
@@ -60,7 +57,8 @@ function mostrarPedidos(pedidos) {
                 <p class="hora">Hora: ${pedido.hora}</p>
             </div>
         </div>
-        `;
+    `;
+    
 
         const pedidoContenedor = document.createElement('div');
         pedidoContenedor.classList.add('pedido');
@@ -85,11 +83,7 @@ function cambiarEstado(pedidoId) {
     })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                alert('Estado cambiado correctamente');
-            } else {
-                alert('Error al cambiar el estado');
-            }
+            alert('Estado cambiado correctamente');
         })
         .catch(error => console.error('Error al cambiar el estado:', error));
 }
