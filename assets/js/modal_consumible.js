@@ -48,7 +48,7 @@ function mostrarModalConsumible(id, imagen, nombre, categoria_nombre, subcategor
             imagen: imagen,
             categoria: categoria_nombre,
             subcategoria: subcategoria_nombre,
-            consumible: true
+            tabla: 'consumibles'
         };
 
         // Obtener pedidos existentes

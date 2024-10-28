@@ -241,8 +241,22 @@
 }
 
 .contenedor-herramientas-pedidas .herramienta.pedido {
-    grid-template-columns: 1fr 1fr 100px;
+    grid-template-columns: 1fr 1fr 60px;
 }
+
+.contenedor-herramientas-pedidas .herramienta.pedido .eliminar_herramienta {
+    padding: 10px;
+    background-color: var(--btn-red);
+    border: 2px solid #ff4c4c;
+    border-radius: 5px;
+    cursor: pointer;
+    color: #fff;
+}
+
+.contenedor-herramientas-pedidas .herramienta.pedido .eliminar_herramienta:hover {
+    opacity: .7;
+}
+
 
 .contenedor_herramientas .contenedor-lista-herramientas .ver_herramienta {
     padding: 7px;
@@ -254,6 +268,7 @@
     box-shadow: 1px 0px 2px var(--objetosOscurosMas);
     cursor: pointer;
 }
+
 
 .contenedor_herramientas .contenedor-lista-herramientas .ver_herramienta:hover {
     box-shadow: 1px 0px 10px var(--objetosOscurosMas);
