@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function obtenerPedidosUsuario() {
-    fetch('http://127.0.0.1:5000/obtener_pedidos_usuario?usuario_id=2')
+    fetch('http://127.0.0.1:5000/obtener_pedidos_usuario?usuario_id=1')
         .then(response => response.json())
         .then(data => mostrarPedidos(data))
         .catch(error => console.error('Error al obtener los pedidos:', error));

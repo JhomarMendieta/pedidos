@@ -29,9 +29,9 @@ function mostrarPedidos(pedidos) {
                 </div>
                 <div class="contenedor_estados">
                     ${pedido.estado === "Cancelado" ? 
-                        '<p class="estado-texto">Pedido Cancelado</p>' 
+                        '<button style="background-color:red;"><p>Pedido Cancelado</p></button>' 
                         : pedido.estado === "Devuelto" ? 
-                        '<p class="estado-texto">Pedido Devuelto</p>' 
+                        '<button style="background-color:red;"> <p>Pedido Devuelto</p></button>' 
                         : `
                         <select id="cambiar_estado_${pedido.id_pedido}">
                             ${estadosGlobales.map(estado => `
@@ -84,6 +84,7 @@ function cambiarEstado(pedidoId) {
         .then(response => response.json())
         .then(data => {
             alert('Estado cambiado correctamente');
+            obtenerTodosLosPedidos()
         })
         .catch(error => console.error('Error al cambiar el estado:', error));
 }
