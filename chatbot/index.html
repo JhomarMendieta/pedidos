@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/header.css">
     <link rel="stylesheet" href="../assets/css/nav.css">
     <title>Interfaz de Mensajería</title>
 </head>
@@ -17,29 +19,7 @@
         </div>
     </label>
     <label for="nav-lateral" class="sombra-nav"></label>
-    <nav class="nav">
-        <div class="modulo"></div>
-        <h3 class="modulo-nombre">ABM</h3>
-        <div class="contenedor-opciones">
-        </div>
-        </div>
-        <div class="modulo">
-            <h3 class="modulo-nombre">PEDIDOS</h3>
-            <div class="contenedor-opciones">
-                <a href="../profesor/index.html" class="opcion">
-                    <p>Inicio</p>
-                </a>
-                <a href="../profesor/herramientas-pedidas.html" class="opcion">
-                    <p>Herramientas Pedidas</p>
-                </a>
-                <a href="../profesor/tu-pedido.html" class="opcion">
-                    <p>Visualizar Pedidos</p>
-                </a>
-                <a href="../chatbot/index.html" class="opcion active">
-                    <p>ChatBot</p>
-                </a>
-            </div>
-        </div>
+    <nav class="nav" id="nav">
     </nav>
     <div class="chat-container">
         <div class="chat-window" id="chatWindow">
@@ -126,3 +106,4 @@
 </body>
 
 </html>
+<script src="navBar.js"></script>

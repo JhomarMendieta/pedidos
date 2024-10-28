@@ -5,19 +5,19 @@ document.getElementById('nav').innerHTML = `
     <div class="modulo">
         <h3 class="modulo-nombre">PEDIDOS</h3>
         <div class="contenedor-opciones">
-            <a href="index.html" class="opcion-nav" data-page="index.html">
+            <a href="../index.html" class="opcion-nav" data-page="index.html">
                 <p>Inicio</p>
             </a>
-            <a href="herramientas-pedidas.html" class="opcion-nav" data-page="herramientas-pedidas.html">
+            <a href="../herramientas-pedidas.html" class="opcion-nav" data-page="herramientas-pedidas.html">
                 <p>Herramientas Pedidas</p>
             </a>
-            <a href="tu-pedido.html" class="opcion-nav" data-page="tu-pedido.html">
+            <a href="../tu-pedido.html" class="opcion-nav" data-page="tu-pedido.html">
                 <p>Visualizar Pedidos</p>
             </a>
-            <a href="chatbot/index.html" class="opcion-nav" data-page="chatbot">
+            <a href="../chatbot/index.html" class="opcion-nav" data-page="chatbot">
                 <p>ChatBot</p>
             </a>
-             <a href="trash/panolero/cambiar-estado-pedido.html" class="opcion-nav" data-page="cambiar-estado-pedido.html">
+            <a href="../trash/panolero/cambiar-estado-pedido.html" class="opcion-nav" data-page="cambiar-estado-pedido.html">
                 <p>Cambiar el estado del pedido</p>
             </a>
         </div>

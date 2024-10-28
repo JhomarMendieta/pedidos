@@ -17,6 +17,9 @@ document.getElementById('nav').innerHTML = `
             <a href="../../chatbot/index.html" class="opcion-nav" data-page="chatbot">
                 <p>ChatBot</p>
             </a>
+            <a href="../../trash/panolero/cambiar-estado-pedido.html" class="opcion-nav" data-page="cambiar-estado-pedido.html">
+                <p>Cambiar el estado del pedido</p>
+            </a>
         </div>
     </div>
 `;

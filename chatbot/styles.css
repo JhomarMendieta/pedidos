@@ -1,9 +1,9 @@
 :root {
     --color-fondo: #999da0; /* Fondo de la interfaz */
-    --color-usuario: #9794fc; /* Color del mensaje del usuario */
-    --color-bot: #e3e572; /* Color del mensaje del bot */
-    --color-boton: #403ae6; /* Color del botón */
-    --color-boton-hover: #403ae6; /* Color del botón al pasar el cursor */
+    --color-usuario: #b7d4ff; /* Color del mensaje del usuario */
+    --color-bot: #ffb7b7; /* Color del mensaje del bot */
+    --color-boton: #4d94ff; /* Color del botón */
+    --color-boton-hover: #4d94ff; /* Color del botón al pasar el cursor */
     --color-input: #f0f0f0; /* Color del input */
 }
 

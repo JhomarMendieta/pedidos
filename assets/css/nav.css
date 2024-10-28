@@ -19,6 +19,7 @@
 }
 
 .boton_nav {
+    z-index: 100;
     position: fixed;
     left: 0;
     top: 30px;
