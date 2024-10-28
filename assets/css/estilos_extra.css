@@ -2,7 +2,7 @@
     width: 100%;
     max-width: 1000px;
     margin: 0 auto;
-    height: 350px;
+    height: max-content;
     border-radius: 10px;
     box-shadow: 1px 0px 5px #898989;
     padding: 15px 20px;
