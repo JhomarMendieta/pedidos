@@ -50,7 +50,7 @@ function mostrarModal(id, imagen, nombre, categoria_nombre, subcategoria_nombre,
             imagen: imagen,
             categoria: categoria_nombre,
             subcategoria: subcategoria_nombre,
-            consumible: consumible
+            tabla: 'tipos_herramienta'
         };
 
         // Obtener pedidos existentes
@@ -61,7 +61,7 @@ function mostrarModal(id, imagen, nombre, categoria_nombre, subcategoria_nombre,
 
         if (!existePedido) {
             // Realizar la llamada al endpoint para actualizar la cantidad en la base de datos
-            const tabla = consumible ? 'consumibles' : 'tipos_herramienta';
+            const tabla = 'tipos_herramienta';
             fetch('http://127.0.0.1:5000/actualizar_cantidad', {
                 method: 'POST',
                 headers: {

@@ -648,6 +648,31 @@ def actualizar_cantidad():
     return jsonify({"status": "success"}), 200
 
 
+@app.route('/actualizar_cantidad_sumar', methods=['POST'])
+def actualizar_cantidad_sumar():
+    data = request.json
+    id = data['id']
+    cantidad = data['cantidad']
+    tabla = data['tabla']
+
+    cursor = mysql.connection.cursor()
+
+    if tabla == 'tipos_herramienta':
+        cursor.execute(
+            "UPDATE tipos_herramienta th JOIN herramientas h ON th.id = h.tipo_id SET th.disponibles = th.disponibles + %s WHERE h.id = %s",
+            (cantidad, id)
+        )
+    elif tabla == 'consumibles':
+        cursor.execute(
+            "UPDATE consumibles SET cantidad = cantidad + %s WHERE id = %s",
+            (cantidad, id)
+        )
+
+    mysql.connection.commit()
+    cursor.close()
+
+    return jsonify({"status": "success", "message": "Cantidad sumada correctamente"}), 200
+
 
 
 
