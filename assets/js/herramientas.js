@@ -13,12 +13,11 @@ function crearConsumibleHTML(consumible) {
     return `
         <div class="herramienta">
             <p class="nombre_herramienta">${consumible.nombre}</p>
-            <button class="ver_herramienta" onclick="mostrarModalConsumible('${consumible.id}', '${consumible.imagen}', '${consumible.nombre}', '${consumible.categoria_nombre}', '${consumible.subcategoria_nombre}', '${consumible.unidad}', ${consumible.cantidad})">Ver</button>
+            <button class="ver_herramienta" onclick="mostrarModalConsumible('${consumible.id}', '${consumible.imagen}', '${consumible.nombre}', '${consumible.categoria_nombre}', '${consumible.subcategoria_nombre}', ${consumible.cantidad})">Ver</button>
         </div>
     `;
 }
 
-// Función para obtener las herramientas con filtro de búsqueda, categoría y subcategoría
 async function obtenerHerramientas(query = '', categoriaId = '', subcategoriaId = '', tipoId = '') {
     try {
         const url = `http://localhost:5000/obtener_herramientas?query=${encodeURIComponent(query)}&categoria_id=${encodeURIComponent(categoriaId)}&subcategoria_id=${encodeURIComponent(subcategoriaId)}&tipo_id=${encodeURIComponent(tipoId)}`;

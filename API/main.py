@@ -455,7 +455,6 @@ def obtener_herramientas():
         conditions = []
         params = []
 
-        # Condicionales para filtrar por nombre, categoría y subcategoría
         if query:
             conditions.append("thrm.nombre LIKE %s")
             params.append(f"%{query}%")
@@ -490,7 +489,6 @@ def obtener_consumibles():
         base_query = """
             SELECT csm.id, 
                    csm.nombre, 
-                   csm.unidad, 
                    csm.cantidad, 
                    csm.imagen, 
                    sctr.nombre AS subcategoria_nombre, 
@@ -503,7 +501,6 @@ def obtener_consumibles():
         conditions = []
         params = []
 
-        # Condicionales para filtrar por nombre, categoría y subcategoría
         if query:
             conditions.append("csm.nombre LIKE %s")
             params.append(f"%{query}%")
@@ -623,6 +620,32 @@ def obtener_tipos_herramienta():
 
 
 
+
+
+@app.route('/actualizar_cantidad', methods=['POST'])
+def actualizar_cantidad():
+    data = request.json
+    print(data)
+    id = data['id']
+    cantidad_a_restar = data['cantidad']
+    tabla = data['tabla']
+
+    cursor = mysql.connection.cursor()
+
+    if tabla == 'tipos_herramienta':
+        cursor.execute(
+            "UPDATE tipos_herramienta th JOIN herramientas h ON th.id = h.tipo_id SET th.disponibles = th.disponibles - %s WHERE h.id = %s",
+            (cantidad_a_restar, id)
+        )
+    elif tabla == 'consumibles':
+        cursor.execute(
+            "UPDATE consumibles SET cantidad = cantidad - %s WHERE id = %s AND cantidad >= %s",
+            (cantidad_a_restar, id, cantidad_a_restar)
+        )
+
+    mysql.connection.commit() 
+    cursor.close() 
+    return jsonify({"status": "success"})
 
 
 if __name__ == '__main__':

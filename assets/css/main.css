@@ -22,7 +22,7 @@
 }
 
 .modal-content {
-    background-color: var(--fongo);
+    background-color: var(--fondo);
     width: 90%;
     max-width: 700px;
 
@@ -80,6 +80,9 @@
     grid-area: "datos-modal";
     grid-column: 2/3;
     grid-row: 3/4;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .modal-cantidad {
@@ -107,10 +110,12 @@
 
 .modal-cantidad .cont input {
     border: none;
-    border: 1px solid #000;
-    width: 50px;
-    text-align: center;
     outline: none;
+    border: 1px solid var(--objetosOscuro);
+    width: 80px;
+    text-align: center;
+    padding: 5px;
+    border-radius: 5px;
 }
 
 .modal-cantidad .cont button {
@@ -124,11 +129,11 @@
     height: 35px;
     border: none;
     border-radius: 5px;
-    color: #000;
+    color: #fff;
 }
 
 .modal-botones button:hover {
-    box-shadow: 0px 0px 5px var(--borde);
+    box-shadow: 0px 0px 5px var(--objetosOscurosMas);
 }
 
 .modal-botones .modal-añadir {
@@ -217,13 +222,15 @@
     box-shadow: 1px 0px 10px var(--objetosOscuros);
 }
 
-.contenedor_herramientas .contenedor-lista-herramientas {
+.contenedor_herramientas .contenedor-lista-herramientas,
+.contenedor-herramientas-pedidas {
     display: grid;
     gap: 10px;
     margin-top: 20px;
 }
 
-.contenedor_herramientas .contenedor-lista-herramientas .herramienta {
+.contenedor_herramientas .contenedor-lista-herramientas .herramienta,
+.contenedor-herramientas-pedidas .herramienta {
     background-color: var(--objetos);
     display: grid;
     grid-template-columns: 1fr 100px;
@@ -231,6 +238,10 @@
     border: 1px solid var(--borde);
     align-items: center;
     border-radius: 5px;
+}
+
+.contenedor-herramientas-pedidas .herramienta.pedido {
+    grid-template-columns: 1fr 1fr 100px;
 }
 
 .contenedor_herramientas .contenedor-lista-herramientas .ver_herramienta {
