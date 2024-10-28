@@ -4,6 +4,7 @@ function mostrarModal(id, imagen, nombre, categoria_nombre, subcategoria_nombre,
     // Crear el contenido del modal
     const modalContent = `
         <div class="modal-content">
+            <input type="text" name="id_herramienta" value="${id}" hidden>
             <span id="cerrar-modal" class="cerrar-button"><i class="fa-solid fa-xmark"></i></span>
             <div class="cont-modal-img">
                 <img class="modal-img" src="${imagen || 'ruta_imagen_predeterminada'}" alt="imagen de la herramienta">
@@ -60,7 +61,7 @@ function mostrarModal(id, imagen, nombre, categoria_nombre, subcategoria_nombre,
 
         if (!existePedido) {
             // Realizar la llamada al endpoint para actualizar la cantidad en la base de datos
-            const tabla = 'tipos_herramienta';
+            const tabla = consumible ? 'consumibles' : 'tipos_herramienta';
             fetch('http://127.0.0.1:5000/actualizar_cantidad', {
                 method: 'POST',
                 headers: {
@@ -72,13 +73,19 @@ function mostrarModal(id, imagen, nombre, categoria_nombre, subcategoria_nombre,
                     tabla: tabla
                 })
             })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error en la respuesta del servidor');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.status === 'success') {
                         // Si la actualización fue exitosa, añadir el pedido a localStorage
                         pedidos.push(pedido);
                         localStorage.setItem('pedidos', JSON.stringify(pedidos));
                         alert(`Añadido ${cantidadSeleccionada} unidades de ${nombre}`);
+                        location.reload(); // Recargar la página solo si la operación fue exitosa
                     } else {
                         alert('Error al actualizar la cantidad en la base de datos.');
                     }

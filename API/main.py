@@ -645,7 +645,56 @@ def actualizar_cantidad():
 
     mysql.connection.commit() 
     cursor.close() 
-    return jsonify({"status": "success"})
+    return jsonify({"status": "success"}), 200
+
+
+
+
+
+@app.route('/crear_pedido', methods=['POST'])
+def crear_pedido():
+    data = request.json
+
+    usuario_fk = int(data['usuario_fk'])  
+    fecha = data['fecha']  
+    horario = data['horario'] 
+    estado_fk = int(data['estado_fk'])  
+    tipo_pedido = int(data['tipo_pedido']) 
+    herramientas = data.get('herramientas', [])  # Usar get para evitar KeyError
+    consumibles = data.get('consumibles', [])  # Usar get para evitar KeyError
+
+    cursor = mysql.connection.cursor()
+    
+    # Insertar el pedido
+    query_pedidos = """
+    INSERT INTO pedidos (usuario_fk, fecha, horario, estado_fk, tipo_pedido) 
+    VALUES (%s, %s, %s, %s, %s)
+    """
+    cursor.execute(query_pedidos, (usuario_fk, fecha, horario, estado_fk, tipo_pedido))
+    pedido_id = cursor.lastrowid 
+
+    # Insertar herramientas si hay alguna
+    if herramientas:
+        query_pedidos_herramientas = """
+        INSERT INTO pedido_herramientas (pedido_id_fk, herramienta_id_fk, cantidad)
+        VALUES (%s, %s, %s)
+        """
+        for herramienta in herramientas:
+            cursor.execute(query_pedidos_herramientas, (pedido_id, int(herramienta['herramienta_id_fk']), int(herramienta['cantidad'])))
+
+    # Insertar consumibles si hay alguno
+    if consumibles:
+        query_pedidos_consumibles = """
+        INSERT INTO pedido_consumibles (pedido_id_fk, consumible_id_fk, cantidad)
+        VALUES (%s, %s, %s)
+        """
+        for consumible in consumibles:
+            cursor.execute(query_pedidos_consumibles, (pedido_id, int(consumible['consumible_id_fk']), int(consumible['cantidad'])))
+
+    mysql.connection.commit() 
+    cursor.close()
+
+    return jsonify({'message': 'Pedido enviado correctamente'}), 201
 
 
 if __name__ == '__main__':

@@ -1,7 +1,6 @@
 function mostrarModalConsumible(id, imagen, nombre, categoria_nombre, subcategoria_nombre, cantidad) {
     const modal = document.getElementById("modal");
 
-    // Crear el contenido del modal para consumibles
     const modalContent = `
         <div class="modal-content">
             <input type="text" name="id_herramienta" value="${id}" hidden>
@@ -58,13 +57,43 @@ function mostrarModalConsumible(id, imagen, nombre, categoria_nombre, subcategor
         // Verificar si ya existe un pedido con el mismo id
         const existePedido = pedidos.some(p => p.id === id);
 
-        if (existePedido) {
-            alert(`El pedido de ${nombre} ya ha sido añadido.`);
+        if (!existePedido) {
+            // Realizar la llamada al endpoint para actualizar la cantidad en la base de datos
+            const tabla = 'consumibles';
+            fetch('http://127.0.0.1:5000/actualizar_cantidad', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: parseInt(id, 10),
+                    cantidad: parseInt(cantidadSeleccionada, 10),
+                    tabla: tabla
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error en la respuesta del servidor');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Si la actualización fue exitosa, añadir el pedido a localStorage
+                        pedidos.push(pedido);
+                        localStorage.setItem('pedidos', JSON.stringify(pedidos));
+                        alert(`Añadido ${cantidadSeleccionada} unidades de ${nombre}`);
+                        location.reload(); // Recargar la página solo si la operación fue exitosa
+                    } else {
+                        alert('Error al actualizar la cantidad en la base de datos.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Hubo un problema al procesar la solicitud.');
+                });
         } else {
-            // Añadir el nuevo pedido
-            pedidos.push(pedido);
-            localStorage.setItem('pedidos', JSON.stringify(pedidos));
-            alert(`Añadido ${cantidadSeleccionada} unidades de ${nombre}`);
+            alert(`El pedido de ${nombre} ya ha sido añadido.`);
         }
     };
 

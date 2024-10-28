@@ -118,8 +118,12 @@ function cargarConsumibles() {
     obtenerConsumibles();
 }
 
+// Función para refrescar la página cada 10 segundos
+
+
 // Escuchar el evento de carga de la página para inicializar
 document.addEventListener('DOMContentLoaded', () => {
     cargarHerramientas();
     document.getElementById('opcion-herramientas').classList.add('active');
 });
+
