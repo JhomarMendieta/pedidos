@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     obtenerTodosLosPedidos();
-    obtenerEstadosPedidos(); 
+    //obtenerEstadosPedidos(); 
 });
 
 let estadosGlobales = []; 
@@ -8,12 +8,14 @@ let estadosGlobales = [];
 function obtenerTodosLosPedidos() {
     fetch('http://127.0.0.1:5000/obtener_pedidos')
         .then(response => response.json())
-        .then(data => mostrarPedidos(data))
+        .then(data =>{
+            estadosGlobales = data.estados; 
+            mostrarPedidos(data.pedidos)})
         .catch(error => console.error('Error al obtener los pedidos:', error));
 }
 
-function obtenerEstadosPedidos() {
-    fetch('http://127.0.0.1:5000/obtener_estados_pedidos') 
+async function obtenerEstadosPedidos() {
+    await fetch('http://127.0.0.1:5000/obtener_estados_pedidos') 
         .then(response => response.json())
         .then(data => {
             estadosGlobales = data;  

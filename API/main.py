@@ -4,6 +4,7 @@ import MySQLdb.cursors
 from datetime import timedelta
 from flask_cors import CORS
 from datetime import datetime
+import json
 
 app = Flask(__name__)
 CORS(app)
@@ -406,13 +407,121 @@ def eliminar_categoria():
 
 
 
+@app.route('/obtener_pedidos_usuario', methods=['GET'])
+def obtener_pedidos_usuario():
+    try:
+        usuario_id = request.args.get('usuario_id')
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        consulta = '''
+        SELECT pedidos.id, pedidos.fecha, pedidos.horario, estado.estado, 
+               pedido_herramientas.cantidad, tipos_herramienta.nombre 
+        FROM pedidos
+        INNER JOIN usuarios ON usuarios.id = pedidos.usuario_fk
+        INNER JOIN estado ON pedidos.estado_fk = estado.id
+        INNER JOIN pedido_herramientas ON pedido_herramientas.pedido_id_fk = pedidos.id
+        INNER JOIN herramientas ON herramientas.id = pedido_herramientas.herramienta_id_fk
+        INNER JOIN tipos_herramienta ON tipos_herramienta.id = herramientas.tipo_id
+        WHERE usuarios.id = %s
+        ORDER BY pedidos.id DESC
+        '''
+        cursor.execute(consulta, (usuario_id,))
+        datos_pedidos = cursor.fetchall()
+
+        pedidos_dict = {}
+        for pedido in datos_pedidos:
+            pedido_id = pedido['id']
+            if pedido_id not in pedidos_dict:
+                hora = str(pedido['horario']) if isinstance(pedido['horario'], timedelta) else pedido['horario']
+
+                pedidos_dict[pedido_id] = {
+                    "estado": pedido['estado'],
+                    "fecha": pedido['fecha'].strftime("%Y-%m-%d"), 
+                    "hora": hora, 
+                    "herramientas": []
+                }
+            pedidos_dict[pedido_id]["herramientas"].append({
+                "nombre": pedido['nombre'],
+                "cantidad": pedido['cantidad']
+            })
+
+        resultado = list(pedidos_dict.values())
+        cursor.close()
+        return jsonify(resultado)
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/obtener_pedidos', methods=['GET'])
+def obtener_pedidos():
+    try:
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        consulta = 'SELECT estado.id, estado.estado FROM estado'
+        cursor.execute(consulta)
+        estados = cursor.fetchall()
+
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        consulta = '''
+        SELECT  pedidos.id AS id_pedido, tipos_herramienta.nombre AS nombre_herramienta,
+                usuarios.nombre AS nombre_usuario, pedidos.fecha, pedidos.horario, estado.estado, 
+                pedido_herramientas.cantidad
+        FROM pedidos
+        INNER JOIN usuarios ON usuarios.id = pedidos.usuario_fk
+        INNER JOIN estado ON pedidos.estado_fk = estado.id
+        INNER JOIN pedido_herramientas ON pedido_herramientas.pedido_id_fk = pedidos.id
+        INNER JOIN herramientas ON herramientas.id = pedido_herramientas.herramienta_id_fk
+        INNER JOIN tipos_herramienta ON tipos_herramienta.id = herramientas.tipo_id
+        ORDER BY pedidos.id
+        '''
+        cursor.execute(consulta)
+        datos_pedidos = cursor.fetchall()
+
+        pedidos_dict = {}
+        for pedido in datos_pedidos:
+            pedido_id = pedido['id_pedido']
+            if pedido_id not in pedidos_dict:
+                hora = str(pedido['horario']) if pedido['horario'] else None
+
+                pedidos_dict[pedido_id] = {
+                    "estado": pedido['estado'],
+                    "id_pedido": pedido['id_pedido'],
+                    "nombre_usuario": pedido['nombre_usuario'],
+                    "fecha": pedido['fecha'].strftime("%Y-%m-%d"),
+                    "hora": hora,
+                    "herramientas": []
+                }
+            pedidos_dict[pedido_id]["herramientas"].append({
+                "nombre": pedido['nombre_herramienta'],
+                "cantidad": pedido['cantidad']
+            })
+
+        resultado = list(pedidos_dict.values())
+        cursor.close()
+        print(json.dumps({"estados": estados, "pedidos": resultado}, indent=4, ensure_ascii=False))
+        return jsonify({"estados": estados, "pedidos": resultado})
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/obtener_estados_pedidos', methods=['GET'])
+def obtener_estados_pedidos():
+    try:
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        consulta = 'SELECT estado.id, estado.estado FROM estado'
+        cursor.execute(consulta)
+        estados = cursor.fetchall()
+
+        cursor.close()
+        return jsonify(estados)
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
+    
 
 
 
 
-
-
-
+#@app.route('/actualizar_estado', methods=['UPDATE'])
 
 #########################################################################################################
 #########################################################################################################

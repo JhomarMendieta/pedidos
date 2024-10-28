@@ -6,6 +6,7 @@ const formModificar = document.getElementById('modificarForm');
 const inputCantidadNueva = document.getElementById('cantidadNueva');
 const inputHerramientaId = document.getElementById('herramientaId');
 
+
 function renderizarHerramientas() {
     contenedorHerramientas.innerHTML = '';
     pedidos.forEach(herramienta => {
