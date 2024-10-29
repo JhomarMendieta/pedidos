@@ -3,7 +3,7 @@ document.getElementById('nav').innerHTML = `
     <h3 class="modulo-nombre">ABM</h3>
     <div class="contenedor-opciones"></div>
     <div class="modulo">
-        <h3 class="modulo-nombre">PEDIDOS</h3>
+        <h3 class="modulo-nombre">ODI</h3>
         <div class="contenedor-opciones">
             <a href="../../index.html" class="opcion-nav" data-page="index.html">
                 <p>Inicio</p>

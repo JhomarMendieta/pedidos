@@ -1,4 +1,5 @@
 .contenedor-tu-pedido {
+   
     width: 100%;
     max-width: 1000px;
     margin: 0 auto;
@@ -9,7 +10,14 @@
     display: grid;
     grid-template-columns: 300px 1fr;
 }
-
+@media (max-width: 1000px) {
+.contenedor-tu-pedido {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-wrap: wrap;
+}
+}
 .contenedor-tu-pedido .estado {
     width: 250px;
     height: 100%;

@@ -151,8 +151,10 @@
 }
 
 .contenedor_herramientas .contendor_opciones_herramienta {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-wrap: wrap;
     gap: 20px;
 }
 
@@ -163,8 +165,13 @@
     text-align: center;
     border-radius: 5px;
     cursor: pointer;
+    width: 45%;
 }
-
+@media (max-width: 800px) {
+    .contenedor_herramientas .contendor_opciones_herramienta .categoria_herramienta {
+        width: 90%;
+    }
+    }
 .contenedor_herramientas .contendor_opciones_herramienta .categoria_herramienta.active {
     background-color: var(--fondo);
     border: 1px solid var(--borde);
@@ -173,8 +180,10 @@
 }
 
 .contenedor_herramientas .cotenedor_filtro {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-wrap: wrap;
     gap: 20px;
 }
 
