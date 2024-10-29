@@ -882,12 +882,11 @@ def crear_pedido():
     estado_fk = int(data['estado_fk'])  
     tipo_pedido = int(data['tipo_pedido']) 
     herramientas = data.get('herramientas', [])  # Usar get para evitar KeyError
-   # consumibles = data.get('consumibles', [])  # Usar get para evitar KeyError
+    consumibles = data.get('consumibles', [])  # Usar get para evitar KeyError
 
     cursor = mysql.connection.cursor()
     
     # Insertar el pedido
-    print("aaaaaaaaa")
     query_pedidos = """
     INSERT INTO pedidos (usuario_fk, fecha, horario, estado_fk, tipo_pedido) 
     VALUES (%s, %s, %s, %s, %s)
