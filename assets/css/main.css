@@ -169,7 +169,7 @@
 }
 @media (max-width: 800px) {
     .contenedor_herramientas .contendor_opciones_herramienta .categoria_herramienta {
-        width: 90%;
+        width: 93%;
     }
     }
 .contenedor_herramientas .contendor_opciones_herramienta .categoria_herramienta.active {
@@ -189,7 +189,7 @@
 
 @media (min-width: 1000px) {
     .cotenedor_filtro .filtro {
-        width: 20%;
+        width: 21.6%;
     }
     }
 @media (max-width: 1000px) {
