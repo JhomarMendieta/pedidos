@@ -439,10 +439,29 @@ def obtener_pedidos_usuario():
                     "hora": hora, 
                     "herramientas": []
                 }
+            
+            # Agregar herramienta a la lista
             pedidos_dict[pedido_id]["herramientas"].append({
                 "nombre": pedido['nombre'],
                 "cantidad": pedido['cantidad']
             })
+
+            # Consulta para obtener los consumibles asociados al pedido
+            consulta_consumibles = '''
+            SELECT c.nombre, pc.cantidad
+            FROM consumibles c
+            JOIN pedido_consumibles pc ON c.id = pc.consumible_id_fk
+            WHERE pc.pedido_id_fk = %s
+            '''
+            cursor.execute(consulta_consumibles, (pedido_id,))
+            consumibles = cursor.fetchall()
+
+            # Agregar consumibles a la misma lista "herramientas"
+            for consumible in consumibles:
+                pedidos_dict[pedido_id]["herramientas"].append({
+                    "nombre": consumible['nombre'],
+                    "cantidad": consumible['cantidad']
+                })
 
         resultado = list(pedidos_dict.values())
         cursor.close()
@@ -450,6 +469,7 @@ def obtener_pedidos_usuario():
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
+
 
 @app.route('/obtener_pedidos', methods=['GET'])
 def obtener_pedidos():
@@ -459,11 +479,10 @@ def obtener_pedidos():
         cursor.execute(consulta)
         estados = cursor.fetchall()
 
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         consulta = '''
-        SELECT  pedidos.id AS id_pedido, tipos_herramienta.nombre AS nombre_herramienta,
-                usuarios.nombre AS nombre_usuario, pedidos.fecha, pedidos.horario, estado.estado, 
-                pedido_herramientas.cantidad
+        SELECT pedidos.id AS id_pedido, tipos_herramienta.nombre AS nombre_herramienta,
+               usuarios.nombre AS nombre_usuario, pedidos.fecha, pedidos.horario, estado.estado, 
+               pedido_herramientas.cantidad
         FROM pedidos
         INNER JOIN usuarios ON usuarios.id = pedidos.usuario_fk
         INNER JOIN estado ON pedidos.estado_fk = estado.id
@@ -489,10 +508,29 @@ def obtener_pedidos():
                     "hora": hora,
                     "herramientas": []
                 }
+
+            # Agregar herramienta a la lista
             pedidos_dict[pedido_id]["herramientas"].append({
                 "nombre": pedido['nombre_herramienta'],
                 "cantidad": pedido['cantidad']
             })
+
+            # Consulta para obtener los consumibles asociados al pedido
+            consulta_consumibles = '''
+            SELECT c.nombre, pc.cantidad
+            FROM consumibles c
+            JOIN pedido_consumibles pc ON c.id = pc.consumible_id_fk
+            WHERE pc.pedido_id_fk = %s
+            '''
+            cursor.execute(consulta_consumibles, (pedido_id,))
+            consumibles = cursor.fetchall()
+
+            # Agregar consumibles a la misma lista "herramientas"
+            for consumible in consumibles:
+                pedidos_dict[pedido_id]["herramientas"].append({
+                    "nombre": consumible['nombre'],
+                    "cantidad": consumible['cantidad']
+                })
 
         resultado = list(pedidos_dict.values())
         cursor.close()
@@ -583,7 +621,7 @@ def cambiar_estado_pedido():
 
         # Acción adicional si el estado es "cancelado" o "devuelto"
         if estado_nombre in ["Cancelado", "Devuelto"]:
-            if estado_nombre in ["Cancelado"]:
+            if estado_nombre == "Cancelado":
                 for consumible in consumibles_list:  # Usar la lista de consumibles
                     print(consumible)  # Imprimir consumible
                     cursor.execute(

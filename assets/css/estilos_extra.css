@@ -112,6 +112,9 @@
     width: 100%;
     height: 30px;
 }
+.contenedor-tu-pedido .datos .herramientas .herramienta input[type="checkbox"]:checked + label {
+    background-color: lightgreen;
+}
 
 .contenedor-tu-pedido .datos p {
     height: 100%;

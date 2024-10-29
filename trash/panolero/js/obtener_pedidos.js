@@ -46,9 +46,16 @@ function mostrarPedidos(pedidos) {
             </div>
             <div class="datos">
                 <p class="hp">Herramientas pedidas:</p>
-                <div class="herramientas">
+                <div class="herramientas" id="herramientas_pedido_${pedido.id_pedido}">
                     ${pedido.herramientas.map(herramienta => `
-                        <p class="herramienta">${herramienta.nombre} - x${herramienta.cantidad}</p>
+                        <p class="herramienta">
+                         ${pedido.estado === "Cancelado" 
+                            ? `<label style="text-decoration: line-through; color: gray;">${herramienta.nombre} - x${herramienta.cantidad}</label>` 
+                            : `<input type="checkbox" ${pedido.estado === "Devuelto" ? "checked" : ""}>&nbsp;
+                               <label>${herramienta.nombre} - x${herramienta.cantidad}</label>`
+                        }
+                        
+                        </p>
                     `).join('')}
                 </div>
                 <p class="usuario">Usuario: ${pedido.nombre_usuario}</p>
@@ -66,11 +73,26 @@ function mostrarPedidos(pedidos) {
         contenedor.appendChild(pedidoContenedor);
     });
 }
+function verificarCheckboxes(pedidoId) {
+    const seleccionado = document.getElementById(`herramientas_pedido_${pedidoId}`);
 
+    const checkboxes = seleccionado.querySelectorAll('.herramientas input[type="checkbox"]');
+    
+    // Usar Array.every para comprobar si todos los checkboxes están marcados
+    const todosMarcados = Array.from(checkboxes).every(checkbox => checkbox.checked);
+    
+    if (todosMarcados) {
+        return true;
+    } else {
+        alert("No todos los checkboxes están seleccionados.");
+        return false;
+    }
+}
 function cambiarEstado(pedidoId) {
     const selectEstado = document.getElementById(`cambiar_estado_${pedidoId}`);
     const nuevoEstadoId = selectEstado.value;
-
+    
+    if(verificarCheckboxes(pedidoId)){
     fetch(`http://127.0.0.1:5000/cambiar_estado_pedido`, {
         method: 'POST',
         headers: {
@@ -87,4 +109,5 @@ function cambiarEstado(pedidoId) {
             obtenerTodosLosPedidos()
         })
         .catch(error => console.error('Error al cambiar el estado:', error));
+    }
 }
