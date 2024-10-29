@@ -91,8 +91,15 @@ function verificarCheckboxes(pedidoId) {
 function cambiarEstado(pedidoId) {
     const selectEstado = document.getElementById(`cambiar_estado_${pedidoId}`);
     const nuevoEstadoId = selectEstado.value;
-    
-    if(verificarCheckboxes(pedidoId)){
+    if(nuevoEstadoId == 4){
+        if(verificarCheckboxes(pedidoId)){
+            enviar(selectEstado,nuevoEstadoId,pedidoId)
+        }
+    }else{
+        enviar(selectEstado,nuevoEstadoId,pedidoId)
+    }
+}
+function enviar(selectEstado,nuevoEstadoId,pedidoId){
     fetch(`http://127.0.0.1:5000/cambiar_estado_pedido`, {
         method: 'POST',
         headers: {
@@ -109,5 +116,5 @@ function cambiarEstado(pedidoId) {
             obtenerTodosLosPedidos()
         })
         .catch(error => console.error('Error al cambiar el estado:', error));
-    }
+    
 }
