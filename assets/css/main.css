@@ -187,6 +187,16 @@
     gap: 20px;
 }
 
+@media (min-width: 1000px) {
+    .cotenedor_filtro .filtro {
+        width: 20%;
+    }
+    }
+@media (max-width: 1000px) {
+    .cotenedor_filtro .filtro {
+        width: 45%;
+    }
+    }
 .contenedor_herramientas .cotenedor_filtro.consumible {
     grid-template-columns: 1fr 1fr 1fr;
 }
