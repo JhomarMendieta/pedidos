@@ -10,7 +10,7 @@ function enviarPedido() {
 
     const herramientas = pedidos.filter(item => !item.consumible);
     const consumibles = pedidos.filter(item => item.consumible);
-    print(herramientas)
+ 
     // Generar fecha y horario
     const fecha = new Date().toISOString().split('T')[0];
     const horario = new Date().toLocaleTimeString();
