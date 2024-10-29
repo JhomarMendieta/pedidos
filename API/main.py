@@ -402,6 +402,13 @@ def eliminar_categoria():
 
 
 
+#########################################################################################################
+#########################################################################################################
+#pedidos
+#########################################################################################################
+#########################################################################################################
+
+
 
 
 
@@ -422,7 +429,8 @@ def obtener_pedidos_usuario():
         INNER JOIN herramientas ON herramientas.id = pedido_herramientas.herramienta_id_fk
         INNER JOIN tipos_herramienta ON tipos_herramienta.id = herramientas.tipo_id
         WHERE usuarios.id = %s
-        ORDER BY pedidos.id DESC
+        ORDER BY pedidos.fecha DESC, pedidos.horario DESC
+
         '''
         cursor.execute(consulta, (usuario_id,))
         datos_pedidos = cursor.fetchall()
@@ -489,7 +497,8 @@ def obtener_pedidos():
         INNER JOIN pedido_herramientas ON pedido_herramientas.pedido_id_fk = pedidos.id
         INNER JOIN herramientas ON herramientas.id = pedido_herramientas.herramienta_id_fk
         INNER JOIN tipos_herramienta ON tipos_herramienta.id = herramientas.tipo_id
-        ORDER BY pedidos.id
+        ORDER BY pedidos.fecha DESC, pedidos.horario DESC
+
         '''
         cursor.execute(consulta)
         datos_pedidos = cursor.fetchall()
@@ -647,19 +656,6 @@ def cambiar_estado_pedido():
     except Exception as e:
         print(f"Error al actualizar el estado del pedido: {e}")
         return jsonify({"error": str(e)}), 500
-
-#########################################################################################################
-#########################################################################################################
-#pedidos
-#########################################################################################################
-#########################################################################################################
-
-
-
-
-
-
-
 
 
 
