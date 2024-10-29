@@ -887,6 +887,7 @@ def crear_pedido():
     cursor = mysql.connection.cursor()
     
     # Insertar el pedido
+    print("aaaaaaaaa")
     query_pedidos = """
     INSERT INTO pedidos (usuario_fk, fecha, horario, estado_fk, tipo_pedido) 
     VALUES (%s, %s, %s, %s, %s)
@@ -901,6 +902,7 @@ def crear_pedido():
         VALUES (%s, %s, %s)
         """
         for herramienta in herramientas:
+            print(int(herramienta['herramienta_id_fk']))
             cursor.execute(query_pedidos_herramientas, (pedido_id, int(herramienta['herramienta_id_fk']), int(herramienta['cantidad'])))
 
     # Insertar consumibles si hay alguno

@@ -21,7 +21,7 @@ function mostrarModalConsumible(id, imagen, nombre, categoria_nombre, subcategor
                 </div>
             </div>
             <div class="modal-botones">
-                <button class="modal-añadir">Añadir al pedido</button>
+                <button class="modal-añadir2">Añadir al pedido</button>
                 <button class="modal-cancelar">Cancelar</button>
             </div>
         </div>
@@ -31,7 +31,7 @@ function mostrarModalConsumible(id, imagen, nombre, categoria_nombre, subcategor
     modal.style.display = "block";
 
     const cerrarModal = modal.querySelector('#cerrar-modal');
-    const botonAñadir = modal.querySelector('.modal-añadir');
+    const botonAñadir = modal.querySelector('.modal-añadir2');
     const botonCancelar = modal.querySelector('.modal-cancelar');
     const cantidadInput = modal.querySelector('#pedir_cantidad');
 

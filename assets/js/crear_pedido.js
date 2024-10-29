@@ -8,7 +8,7 @@ function enviarPedido() {
     // Obtener pedidos del localStorage
     const pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
 
-    const herramientas = pedidos.filter(item => !item.consumible);
+    const herramientas = pedidos.filter(item => !item.herramientas);
     const consumibles = pedidos.filter(item => item.consumible);
 
     // Generar fecha y horario

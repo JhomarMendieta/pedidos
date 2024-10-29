@@ -131,7 +131,7 @@
     box-shadow: 0px 0px 5px #888;
 }
 
-.modal-botones .modal-añadir {
+.modal-botones .modal-añadir, .modal-botones .modal-añadir2 {
     background-color: var(--btn-blue);
 }
 
