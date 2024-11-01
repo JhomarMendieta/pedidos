@@ -10,12 +10,18 @@ function obtenerTodosLosPedidos() {
         .then(data =>{
             estadosGlobales = data.estados; 
             mostrarPedidos(data.pedidos)})
-        .catch(error => console.error('Error al obtener los pedidos:', error));
+        .catch(error => {
+            console.error('Error al obtener los pedidos:', error)
+            sinconexion()
+            });
 }
 
 
 
-
+function sinconexion() {
+    const contenedor = document.getElementById('contenedor-tu-pedido');
+    contenedor.innerHTML = '<div class="sinconexion">sin conexión<div>';
+}
 
 function mostrarPedidos(pedidos) {
     const contenedor = document.getElementById('contenedor-tu-pedido');

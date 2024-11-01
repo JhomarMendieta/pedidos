@@ -6,9 +6,15 @@ function obtenerPedidosUsuario() {
     fetch('http://127.0.0.1:5000/obtener_pedidos_usuario?usuario_id=1')
         .then(response => response.json())
         .then(data => mostrarPedidos(data))
-        .catch(error => console.error('Error al obtener los pedidos:', error));
+        .catch(error =>  {console.error('Error al obtener los pedidos:', error)
+        sinconexion()
+        });
 }
 
+function sinconexion() {
+    const contenedor = document.getElementById('contenedor-tu-pedido');
+    contenedor.innerHTML = '<div class="sinconexion">sin conexión<div>';
+}
 function mostrarPedidos(pedidos) {
     const contenedor = document.getElementById('contenedor-tu-pedido');
     contenedor.innerHTML = '';
