@@ -419,6 +419,7 @@ def obtener_pedidos_usuario():
     try:
         usuario_id = request.args.get('usuario_id')
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        
         consulta = '''
         SELECT pedidos.id, pedidos.fecha, pedidos.horario, estado.estado, 
                pedido_herramientas.cantidad, tipos_herramienta.nombre 
@@ -430,7 +431,6 @@ def obtener_pedidos_usuario():
         INNER JOIN tipos_herramienta ON tipos_herramienta.id = herramientas.tipo_id
         WHERE usuarios.id = %s
         ORDER BY pedidos.fecha DESC, pedidos.horario DESC
-
         '''
         cursor.execute(consulta, (usuario_id,))
         datos_pedidos = cursor.fetchall()
@@ -454,7 +454,8 @@ def obtener_pedidos_usuario():
                 "cantidad": pedido['cantidad']
             })
 
-            # Consulta para obtener los consumibles asociados al pedido
+        # Consulta para obtener los consumibles y asignarlos solo una vez por cada pedido
+        for pedido_id in pedidos_dict:
             consulta_consumibles = '''
             SELECT c.nombre, pc.cantidad
             FROM consumibles c
@@ -464,7 +465,7 @@ def obtener_pedidos_usuario():
             cursor.execute(consulta_consumibles, (pedido_id,))
             consumibles = cursor.fetchall()
 
-            # Agregar consumibles a la misma lista "herramientas"
+            # Agregar consumibles a la lista "herramientas" para cada pedido
             for consumible in consumibles:
                 pedidos_dict[pedido_id]["herramientas"].append({
                     "nombre": consumible['nombre'],
@@ -555,6 +556,9 @@ def obtener_pedidos():
         return jsonify({"error": str(e)}), 500
 
 
+
+
+
 @app.route('/obtener_estados_pedidos', methods=['GET'])
 def obtener_estados_pedidos():
     try:
@@ -568,9 +572,6 @@ def obtener_estados_pedidos():
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
-    
-
-
 
 @app.route('/cambiar_estado_pedido', methods=['POST'])
 def cambiar_estado_pedido():
@@ -670,6 +671,7 @@ def obtener_cantidad_por_id(herramientas, id_busqueda):
         if herramienta["id"] == id_busqueda:
             return herramienta["cantidad"]
     return None 
+
 
 
 @app.route('/obtener_herramientas', methods=['GET'])

@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/css/global.css">
     <link rel="stylesheet" href="assets/css/header.css">
-    <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="assets/css/nav.css">
     <link rel="stylesheet" href="assets/css/estilos_extra.css">
     <title>Document</title>
@@ -14,7 +13,7 @@
 
 <body>
     <header class="header">
-        <h1>Tus pedidos</h1>
+        <h1>Todos los pedidos</h1>
     </header>
     <input type="checkbox" id="nav-lateral" style="display: none;">
     <label for="nav-lateral">
@@ -31,9 +30,15 @@
     </main>
 
 
-    <script src="assets/js/tu-pedido.js"></script>
+    <script src="assets/js/obtener_pedidos.js"></script>
     <script src="assets/js/navBar.js"></script>
     <script src="https://kit.fontawesome.com/45f45403cb.js" crossorigin="anonymous"></script>
+    <script>
+        const identificador = "panolero";
+        if (identificador != "panolero") {
+            window.history.back();
+        }
+    </script>
 </body>
 
 </html>

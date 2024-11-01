@@ -1,8 +1,8 @@
 .contenedor-tu-pedido {
-   
+
     width: 100%;
     max-width: 1000px;
-    margin: 0 auto;
+    margin: 10px auto;
     height: max-content;
     border-radius: 10px;
     box-shadow: 1px 0px 5px #898989;
@@ -10,14 +10,16 @@
     display: grid;
     grid-template-columns: 300px 1fr;
 }
+
 @media (max-width: 1000px) {
-.contenedor-tu-pedido {
-    align-items: center;
-    justify-content: center;
-    display: flex;
-    flex-wrap: wrap;
+    .contenedor-tu-pedido {
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        flex-wrap: wrap;
+    }
 }
-}
+
 .contenedor-tu-pedido .estado {
     width: 250px;
     height: 100%;
@@ -80,24 +82,26 @@
     height: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 50px 1fr 50px 50px;
+    grid-template-rows: 50px 150px 50px 50px;
     grid-template-areas:
         "hp hp"
         "tools tools"
         "usuario npedido"
         "fecha hora";
 }
+
 .contenedor-tu-pedido .datos2 {
     width: 100%;
     height: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 50px 1fr 50px;
+    grid-template-rows: 50px 200px 50px;
     grid-template-areas:
         "hp hp"
         "tools tools"
         "fecha hora";
 }
+
 .contenedor-tu-pedido .datos .hp {
     width: 100%;
     grid-area: "hp";
@@ -122,7 +126,8 @@
     width: 100%;
     height: 30px;
 }
-.contenedor-tu-pedido .datos .herramientas .herramienta input[type="checkbox"]:checked + label {
+
+.contenedor-tu-pedido .datos .herramientas .herramienta input[type="checkbox"]:checked+label {
     background-color: lightgreen;
 }
 
@@ -173,7 +178,8 @@
     width: 100%;
     height: 30px;
 }
-.contenedor-tu-pedido .datos2 .herramientas .herramienta input[type="checkbox"]:checked + label {
+
+.contenedor-tu-pedido .datos2 .herramientas .herramienta input[type="checkbox"]:checked+label {
     background-color: lightgreen;
 }
 
