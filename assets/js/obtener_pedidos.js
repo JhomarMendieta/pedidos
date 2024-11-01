@@ -61,7 +61,7 @@ function mostrarPedidos(pedidos) {
                          ${pedido.estado === "Cancelado" 
                             ? `<label style="text-decoration: line-through; color: gray;">${herramienta.nombre} - x${herramienta.cantidad}</label>` 
                             : `<input type="checkbox" ${pedido.estado === "Devuelto" ? "checked" : ""}>
-                            &nbsp<input type="number" value="${herramienta.cantidad}" min="0" max="${herramienta.cantidad}">&nbsp;
+                            &nbsp<input type="number" class="cantidad" value="${herramienta.cantidad}" min="0" max="${herramienta.cantidad}">&nbsp;
                             <input type="hidden" class="tabla" value="${herramienta.tabla}">
                             <input type="hidden" class="idinput" value="${herramienta.id}">
                                <label>${herramienta.nombre} - x${herramienta.cantidad}</label>`
@@ -84,16 +84,20 @@ function mostrarPedidos(pedidos) {
         pedidoContenedor.innerHTML = pedidoHTML;
         contenedor.appendChild(pedidoContenedor);
     });
-    const numberInputs = document.querySelectorAll('input[type="number"]');
+    const numberInputs = document.querySelectorAll('.cantidad'); 
+console.log(numberInputs);
 
 numberInputs.forEach(input => {
-
   input.addEventListener('input', () => {
-    if (input.value > input.max) {
-      input.value = input.max;
+    // Verifica que el valor ingresado sea un número y no exceda el máximo
+    if (input.value !== '' && !isNaN(input.value) && parseInt(input.value) > parseInt(input.max)) {
+      input.value = input.max; // Establece el valor máximo si se excede
+    } else if (input.value === '') {
+      input.value = ''; // Permite el campo vacío
     }
   });
 });
+
 }
 function verificarCheckboxes(pedidoId) {
     const seleccionado = document.getElementById(`herramientas_pedido_${pedidoId}`);
