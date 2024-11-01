@@ -10,7 +10,7 @@ CORS(app)
 
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'panol2'
+app.config['MYSQL_DB'] = 'panol'
 app.config['MYSQL_HOST'] = 'localhost'
 
 mysql = MySQL(app)
@@ -79,7 +79,7 @@ def recibir_mensaje():
                 cantidad_pedida = int(mensaje) 
                 if herramienta_seleccionada:
                     herramienta = next((h for h in herramientas if h['nombre'].lower() == herramienta_seleccionada["nombre"].lower()), {})
-                    if herramienta and cantidad_pedida <= herramienta['cantidad']:
+                    if herramienta and cantidad_pedida <= herramienta['cantidad'] and cantidad_pedida > 0:
                         response = {
                         "response":[
                             f"Está seguro que quiere pedir Herramienta: {herramienta['nombre']} {herramienta['id']}<br> Cantidad: {cantidad_pedida}?<br>- <a onclick=\"enviartexto('confirmar pedido')\">Confirmar pedido</a><br>- <a onclick=\"enviartexto('elegir otra cantidad')\">Elegir otra cantidad</a>",

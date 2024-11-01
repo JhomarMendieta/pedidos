@@ -18,3 +18,20 @@
     box-sizing: border-box;
     font-family: arial;
 }
+.sinconexion{
+    background-image:url(../img/sin-conexion.svg); 
+    background-size: 100px; 
+    width:100%; 
+    height: 100%; 
+    position:absolute; 
+    left:0%; 
+    top:0%; 
+    background-repeat:no-repeat; 
+    z-index: 10; 
+    background-position:center 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #898989;
+}

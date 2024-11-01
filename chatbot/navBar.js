@@ -17,7 +17,8 @@ document.getElementById('nav').innerHTML = `
             <a href="../chatbot/index.html" class="opcion-nav" data-page="chatbot">
                 <p>ChatBot</p>
             </a>
-            <a href="../trash/panolero/cambiar-estado-pedido.html" class="opcion-nav" data-page="cambiar-estado-pedido.html">
+            <h3 id="separacion-panolero" style="display: none">Pañolero</h3>
+            <a href="../cambiar-estado-pedido.html" class="opcion-nav" data-page="cambiar-estado-pedido.html">
                 <p>Cambiar el estado del pedido</p>
             </a>
         </div>

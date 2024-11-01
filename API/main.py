@@ -489,7 +489,7 @@ def obtener_pedidos():
         estados = cursor.fetchall()
 
         consulta = '''
-        SELECT pedidos.id AS id_pedido, tipos_herramienta.nombre AS nombre_herramienta,
+        SELECT pedidos.id AS id_pedido, tipos_herramienta.nombre AS nombre_herramienta, herramientas.id AS id_her,
                usuarios.nombre AS nombre_usuario, pedidos.fecha, pedidos.horario, estado.estado, 
                pedido_herramientas.cantidad
         FROM pedidos
@@ -522,12 +522,15 @@ def obtener_pedidos():
             # Agregar herramienta a la lista
             pedidos_dict[pedido_id]["herramientas"].append({
                 "nombre": pedido['nombre_herramienta'],
-                "cantidad": pedido['cantidad']
+                "cantidad": pedido['cantidad'],
+                "id": pedido['id_her'],
+                "tabla": "herramienta",
+
             })
 
             # Consulta para obtener los consumibles asociados al pedido
             consulta_consumibles = '''
-            SELECT c.nombre, pc.cantidad
+            SELECT c.nombre, c.id, pc.cantidad
             FROM consumibles c
             JOIN pedido_consumibles pc ON c.id = pc.consumible_id_fk
             WHERE pc.pedido_id_fk = %s
@@ -539,7 +542,9 @@ def obtener_pedidos():
             for consumible in consumibles:
                 pedidos_dict[pedido_id]["herramientas"].append({
                     "nombre": consumible['nombre'],
-                    "cantidad": consumible['cantidad']
+                    "cantidad": consumible['cantidad'],
+                    "id": consumible['id'],
+                    "tabla": "consumible",
                 })
 
         resultado = list(pedidos_dict.values())
@@ -571,82 +576,84 @@ def obtener_estados_pedidos():
 @app.route('/cambiar_estado_pedido', methods=['POST'])
 def cambiar_estado_pedido():
     try:
-        # Obtener los datos del JSON en el cuerpo de la solicitud
         datos = request.get_json()
         pedido_id = datos.get('pedido_id')
         estado_id = datos.get('estado_id')
+        cantidades = datos.get('cantidades')
+        print(cantidades)
         
         if not pedido_id or not estado_id:
             return jsonify({"error": "Faltan datos requeridos"}), 400
         
-        # Conectar a la base de datos y actualizar el estado del pedido
         cursor = mysql.connection.cursor()
         
-        # Consulta para obtener el nombre del estado (cancelado, devuelto, etc.)
         cursor.execute("SELECT estado FROM estado WHERE id = %s", (estado_id,))
-        estado = cursor.fetchone()  # Devuelve una tupla
+        estado = cursor.fetchone()  
         
-        # Si estado es None, significa que no se encontró el estado
         if estado is None:
             return jsonify({"error": "Estado no encontrado"}), 404
             
-        estado_nombre = estado[0]  # Accede al primer elemento de la tupla
+        estado_nombre = estado[0]  
         
-        # Ejecutar la consulta para obtener los detalles del pedido
         cursor.execute("""SELECT *
             FROM pedido_consumibles pc
             LEFT JOIN pedido_herramientas ph ON pc.pedido_id_fk = ph.pedido_id_fk
             WHERE pc.pedido_id_fk = %s""", (pedido_id,))
         
-        # Obtener los nombres de las columnas
-        nombres_campos = [i[0] for i in cursor.description]  # Obtener los nombres de las columnas
-        herramientas = cursor.fetchall()  # Obtener todos los resultados
+        nombres_campos = [i[0] for i in cursor.description]  
+        herramientas = cursor.fetchall()  
         
-        # Separar los resultados en consumibles y herramientas
         consumibles_list = []
         herramientas_list = []
 
         for fila in herramientas:
-            # Crear un diccionario para la fila actual
             fila_dict = {nombres_campos[i]: fila[i] for i in range(len(nombres_campos))}
 
-            # Separar en consumibles y herramientas
             if fila_dict.get('consumible_id_fk') is not None:
-                # Agregar solo los campos relevantes de consumibles
                 consumibles_list.append({
-                    'id': fila_dict['id'],
                     'pedido_id_fk': fila_dict['pedido_id_fk'],
-                    'consumible_id_fk': fila_dict['consumible_id_fk']
+                    'consumible_id_fk': fila_dict['consumible_id_fk'],
+                    'cantidad': fila_dict['cantidad']
                 })
             if fila_dict.get('herramienta_id_fk') is not None:
-                # Agregar solo los campos relevantes de herramientas
                 herramientas_list.append({
                     'cantidad': fila_dict['cantidad'],
                     'herramienta_id_fk': fila_dict['herramienta_id_fk'],
                     'pedido_id_fk': fila_dict['pedido_id_fk']
                 })
 
-        # Actualizar el estado del pedido
         cursor.execute("UPDATE pedidos SET estado_fk = %s WHERE id = %s", (estado_id, pedido_id))
 
-        # Acción adicional si el estado es "cancelado" o "devuelto"
         if estado_nombre in ["Cancelado", "Devuelto"]:
-            if estado_nombre == "Cancelado":
-                for consumible in consumibles_list:  # Usar la lista de consumibles
-                    print(consumible)  # Imprimir consumible
+            for consumible in consumibles_list:  
+                #print(consumible) 
+                if estado_nombre == "Cancelado":
                     cursor.execute(
                         "UPDATE consumibles SET cantidad = cantidad + %s WHERE id = %s AND cantidad >= %s",
-                        (1, consumible["consumible_id_fk"], 1)  # Asegúrate de usar la cantidad correcta
+                        (consumible["cantidad"], consumible["consumible_id_fk"], 1)  
+                    )
+                    
+                else:
+                    cantidad = obtener_cantidad_por_id(cantidades, consumible["consumible_id_fk"])
+                    cursor.execute(
+                        "UPDATE consumibles SET cantidad = cantidad + %s WHERE id = %s AND cantidad >= %s",
+                        (cantidad, consumible["consumible_id_fk"], 1) 
                     )
 
-            for herramienta in herramientas_list:  # Usar la lista de herramientas
-                print(herramienta)  # Imprimir herramienta
-                cursor.execute(
-                    "UPDATE tipos_herramienta th JOIN herramientas h ON th.id = h.tipo_id SET th.disponibles = th.disponibles + %s WHERE h.id = %s",
-                    (herramienta["cantidad"], herramienta["herramienta_id_fk"])
-                )
+            for herramienta in herramientas_list:  
+                #print(herramienta) 
+                if estado_nombre == "Cancelado":
+                    cursor.execute(
+                        "UPDATE tipos_herramienta th JOIN herramientas h ON th.id = h.tipo_id SET th.disponibles = th.disponibles + %s WHERE h.id = %s",
+                        (herramienta["cantidad"], herramienta["herramienta_id_fk"])
+                    )
+                else:
+                    cantidad = obtener_cantidad_por_id(cantidades, herramienta["herramienta_id_fk"])
+                    cursor.execute(
+                        "UPDATE tipos_herramienta th JOIN herramientas h ON th.id = h.tipo_id SET th.disponibles = th.disponibles + %s WHERE h.id = %s",
+                        (cantidad, herramienta["herramienta_id_fk"])
+                    )
 
-        # Confirmar cambios en la base de datos
         mysql.connection.commit()
         cursor.close()
         
@@ -655,10 +662,15 @@ def cambiar_estado_pedido():
                         "herramientas": herramientas_list}), 200
     
     except Exception as e:
-        print(f"Error al actualizar el estado del pedido: {e}")
+      #  print(f"Error al actualizar el estado del pedido: {e}")
         return jsonify({"error": str(e)}), 500
 
 
+def obtener_cantidad_por_id(herramientas, id_busqueda):
+    for herramienta in herramientas:
+        if herramienta["id"] == id_busqueda:
+            return herramienta["cantidad"]
+    return None 
 
 
 

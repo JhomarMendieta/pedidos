@@ -10,9 +10,18 @@ function obtenerTodosLosPedidos() {
         .then(data =>{
             estadosGlobales = data.estados; 
             mostrarPedidos(data.pedidos)})
-        .catch(error => console.error('Error al obtener los pedidos:', error));
+        .catch(error => {
+            console.error('Error al obtener los pedidos:', error)
+            sinconexion()
+            });
 }
 
+
+
+function sinconexion() {
+    const contenedor = document.getElementById('contenedor-tu-pedido');
+    contenedor.innerHTML = '<div class="sinconexion">sin conexión<div>';
+}
 
 function mostrarPedidos(pedidos) {
     const contenedor = document.getElementById('contenedor-tu-pedido');
@@ -51,7 +60,10 @@ function mostrarPedidos(pedidos) {
                         <p class="herramienta">
                          ${pedido.estado === "Cancelado" 
                             ? `<label style="text-decoration: line-through; color: gray;">${herramienta.nombre} - x${herramienta.cantidad}</label>` 
-                            : `<input type="checkbox" ${pedido.estado === "Devuelto" ? "checked" : ""}>&nbsp;
+                            : `<input type="checkbox" ${pedido.estado === "Devuelto" ? "checked" : ""}>
+                            &nbsp<input type="number" class="cantidad" value="${herramienta.cantidad}" min="0" max="${herramienta.cantidad}">&nbsp;
+                            <input type="hidden" class="tabla" value="${herramienta.tabla}">
+                            <input type="hidden" class="idinput" value="${herramienta.id}">
                                <label>${herramienta.nombre} - x${herramienta.cantidad}</label>`
                         }
                         
@@ -72,34 +84,71 @@ function mostrarPedidos(pedidos) {
         pedidoContenedor.innerHTML = pedidoHTML;
         contenedor.appendChild(pedidoContenedor);
     });
+    const numberInputs = document.querySelectorAll('.cantidad'); 
+console.log(numberInputs);
+
+numberInputs.forEach(input => {
+  input.addEventListener('input', () => {
+    // Verifica que el valor ingresado sea un número y no exceda el máximo
+    if (input.value !== '' && !isNaN(input.value) && parseInt(input.value) > parseInt(input.max)) {
+      input.value = input.max; // Establece el valor máximo si se excede
+    } else if (input.value === '') {
+      input.value = ''; // Permite el campo vacío
+    }
+  });
+});
+
 }
 function verificarCheckboxes(pedidoId) {
     const seleccionado = document.getElementById(`herramientas_pedido_${pedidoId}`);
 
     const checkboxes = seleccionado.querySelectorAll('.herramientas input[type="checkbox"]');
     
-    // Usar Array.every para comprobar si todos los checkboxes están marcados
     const todosMarcados = Array.from(checkboxes).every(checkbox => checkbox.checked);
     
-    if (todosMarcados) {
-        return true;
-    } else {
-        alert("No todos los checkboxes están seleccionados.");
-        return false;
+    if (!todosMarcados) {
+        return {
+            todosMarcados: false
+        };
     }
+    
+    const idinput = seleccionado.querySelectorAll('.herramientas .idinput');
+    const tablainput = seleccionado.querySelectorAll('.herramientas .tabla');
+    const cantidadinput = seleccionado.querySelectorAll('.herramientas input[type="number"]');
+
+    const herramientas = Array.from(idinput).map((idinput2, index) => {
+        return {
+            id: parseInt(idinput2.value),  
+            cantidad: parseInt(cantidadinput[index].value) || 0,  
+            tabla: tablainput[index].value 
+        };
+    });
+    console.log("Lista de herramientas con cantidades:", herramientas);
+    
+    return {
+        todosMarcados: true,
+        cantidades: herramientas
+    };
 }
+
+
 function cambiarEstado(pedidoId) {
     const selectEstado = document.getElementById(`cambiar_estado_${pedidoId}`);
     const nuevoEstadoId = selectEstado.value;
+
     if(nuevoEstadoId == 4){
-        if(verificarCheckboxes(pedidoId)){
-            enviar(selectEstado,nuevoEstadoId,pedidoId)
+        respuesta = verificarCheckboxes(pedidoId)
+        if(respuesta.todosMarcados){
+            enviar(selectEstado,nuevoEstadoId,pedidoId,respuesta.cantidades)
+        }else{
+            alert("No todos los checkboxes están seleccionados.");
         }
     }else{
-        enviar(selectEstado,nuevoEstadoId,pedidoId)
+        enviar(selectEstado,nuevoEstadoId,pedidoId,[])
     }
 }
-function enviar(selectEstado,nuevoEstadoId,pedidoId){
+function enviar(selectEstado,nuevoEstadoId,pedidoId,cantidades){
+    console.log(cantidades)
     fetch(`http://127.0.0.1:5000/cambiar_estado_pedido`, {
         method: 'POST',
         headers: {
@@ -107,7 +156,8 @@ function enviar(selectEstado,nuevoEstadoId,pedidoId){
         },
         body: JSON.stringify({
             pedido_id: pedidoId,
-            estado_id: nuevoEstadoId
+            estado_id: nuevoEstadoId,
+            cantidades: cantidades
         })
     })
         .then(response => response.json())
