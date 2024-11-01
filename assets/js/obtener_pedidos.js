@@ -12,15 +12,15 @@ function obtenerTodosLosPedidos() {
             mostrarPedidos(data.pedidos)})
         .catch(error => {
             console.error('Error al obtener los pedidos:', error)
-            sinconexion()
+            sinconexion(error)
             });
 }
 
 
 
-function sinconexion() {
+function sinconexion(error) {
     const contenedor = document.getElementById('contenedor-tu-pedido');
-    contenedor.innerHTML = '<div class="sinconexion">sin conexión<div>';
+    contenedor.innerHTML = '<div class="sinconexion">'+error+'<div>';
 }
 
 function mostrarPedidos(pedidos) {
@@ -89,11 +89,10 @@ console.log(numberInputs);
 
 numberInputs.forEach(input => {
   input.addEventListener('input', () => {
-    // Verifica que el valor ingresado sea un número y no exceda el máximo
-    if (input.value !== '' && !isNaN(input.value) && parseInt(input.value) > parseInt(input.max)) {
-      input.value = input.max; // Establece el valor máximo si se excede
+    if (input.value !== 0 && !isNaN(input.value) && parseInt(input.value) > parseInt(input.max)) {
+      input.value = input.max; 
     } else if (input.value === '') {
-      input.value = ''; // Permite el campo vacío
+      input.value = 0; 
     }
   });
 });
