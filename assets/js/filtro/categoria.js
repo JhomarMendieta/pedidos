@@ -24,8 +24,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
 
                 // Cargar subcategorías y tipos inmediatamente después de cargar categorías
-                cargarSubcategorias(); // Cargar todas las subcategorías
-                cargarTiposHerramienta(); // Cargar todos los tipos
+                cargarSubcategorias();
+                cargarTiposHerramienta();
             } else {
                 console.error("No se pudieron obtener las categorías");
             }
@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Función para cargar subcategorías en función de la categoría seleccionada
     async function cargarSubcategorias() {
-        const categoriaId = categoriaSelect.value; // Obtener el ID de la categoría seleccionada
+        const categoriaId = categoriaSelect.value;
 
         let url;
         if (!categoriaId) {
@@ -71,14 +71,13 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("Error al cargar las subcategorías:", error);
         }
 
-        // Después de cargar subcategorías, cargar tipos de herramienta
         cargarTiposHerramienta();
     }
 
     // Función para cargar tipos de herramienta
     async function cargarTiposHerramienta() {
-        const categoriaId = categoriaSelect.value; // Obtener el ID de la categoría seleccionada
-        const subcategoriaId = subcategoriaSelect.value; // Obtener el ID de la subcategoría seleccionada
+        const categoriaId = categoriaSelect.value;
+        const subcategoriaId = subcategoriaSelect.value;
 
         let url = 'http://127.0.0.1:5000/tipos_herramienta';
         const params = new URLSearchParams();
@@ -100,7 +99,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 const tipos = await response.json();
                 tipoSelect.innerHTML = '<option value="">Seleccionar tipo</option>';
 
-                // Llenar el select con los tipos obtenidos
                 if (tipos.length > 0) {
                     tipos.forEach(tipo => {
                         const option = document.createElement("option");
@@ -121,10 +119,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Eventos para manejar los cambios
     categoriaSelect.addEventListener('change', () => {
         cargarSubcategorias();
-        cargarTiposHerramienta(); // Cargar tipos cuando cambie la categoría
+        cargarTiposHerramienta();
     });
 
     subcategoriaSelect.addEventListener('change', cargarTiposHerramienta);
@@ -135,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
         consumiblesBtn.classList.remove('active');
         document.getElementById('buscar-herramieta').style.display = 'block';
         document.getElementById('buscar-consumible').style.display = 'none';
-        cargarCategorias(); // Cargar categorías de herramientas
+        cargarCategorias();
     }
 
     // Función para cambiar a la vista de consumibles y cargar categorías
@@ -144,13 +141,12 @@ document.addEventListener("DOMContentLoaded", function () {
         herramientasBtn.classList.remove('active');
         document.getElementById('buscar-consumible').style.display = 'block';
         document.getElementById('buscar-herramieta').style.display = 'none';
-        cargarCategorias(); // Cargar categorías de consumibles
+        cargarCategorias();
     }
 
     // Eventos para cambiar de vista y cargar las categorías correspondientes
     herramientasBtn.addEventListener('click', cargarHerramientas);
     consumiblesBtn.addEventListener('click', cargarConsumibles);
 
-    // Llamar a la función para cargar las categorías al cargar la página en vista de herramientas por defecto
     cargarHerramientas();
 });

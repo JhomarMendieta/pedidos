@@ -662,7 +662,6 @@ def cambiar_estado_pedido():
                         "herramientas": herramientas_list}), 200
     
     except Exception as e:
-      #  print(f"Error al actualizar el estado del pedido: {e}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -843,7 +842,6 @@ def obtener_subcategorias_consumibles():
     
     with mysql.connection.cursor(MySQLdb.cursors.DictCursor) as cursor:
         if categoria_id:
-            # Filtrar subcategorías según la categoría seleccionada
             cursor.execute("""
                 SELECT DISTINCT subcategorias.id, subcategorias.nombre
                 FROM subcategorias
@@ -851,7 +849,6 @@ def obtener_subcategorias_consumibles():
                 WHERE subcategorias.categoria_id = %s
             """, (categoria_id,))
         else:
-            # Obtener todas las subcategorías si no hay categoría seleccionada
             cursor.execute("""
                 SELECT DISTINCT subcategorias.id, subcategorias.nombre
                 FROM subcategorias
@@ -884,7 +881,6 @@ def obtener_tipos_herramienta():
     """
     params = []
 
-    # Añadir condiciones a la consulta en función de los IDs proporcionados
     where_clauses = []
     
     if categoria_id:
@@ -895,7 +891,6 @@ def obtener_tipos_herramienta():
         where_clauses.append("tipos_herramienta.subcategoria_id = %s")
         params.append(subcategoria_id)
 
-    # Si hay condiciones, agregarlas a la consulta
     if where_clauses:
         query += " WHERE " + " AND ".join(where_clauses)
 
