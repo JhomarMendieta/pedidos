@@ -422,7 +422,7 @@ def obtener_pedidos_usuario():
         
         consulta = '''
         SELECT pedidos.id, pedidos.fecha, pedidos.horario, estado.estado, 
-               pedido_herramientas.cantidad, tipos_herramienta.nombre 
+               pedido_herramientas.cantidad,pedido_herramientas.devueltos AS devueltos, tipos_herramienta.nombre 
         FROM pedidos
         INNER JOIN usuarios ON usuarios.id = pedidos.usuario_fk
         INNER JOIN estado ON pedidos.estado_fk = estado.id
@@ -451,7 +451,9 @@ def obtener_pedidos_usuario():
             # Agregar herramienta a la lista
             pedidos_dict[pedido_id]["herramientas"].append({
                 "nombre": pedido['nombre'],
-                "cantidad": pedido['cantidad']
+                "cantidad": pedido['cantidad'],
+                "tabla": "herramienta",
+                "devueltos": pedido['devueltos']
             })
 
         # Consulta para obtener los consumibles y asignarlos solo una vez por cada pedido
@@ -469,7 +471,9 @@ def obtener_pedidos_usuario():
             for consumible in consumibles:
                 pedidos_dict[pedido_id]["herramientas"].append({
                     "nombre": consumible['nombre'],
-                    "cantidad": consumible['cantidad']
+                    "cantidad": consumible['cantidad'],
+                    "tabla": "consumible",
+                    "devueltos": 0
                 })
 
         resultado = list(pedidos_dict.values())
@@ -490,8 +494,8 @@ def obtener_pedidos():
 
         consulta = '''
         SELECT pedidos.id AS id_pedido, tipos_herramienta.nombre AS nombre_herramienta, herramientas.id AS id_her,
-               usuarios.nombre AS nombre_usuario, pedidos.fecha, pedidos.horario, estado.estado, 
-               pedido_herramientas.cantidad
+               usuarios.nombre AS nombre_usuario, pedidos.fecha, pedidos.horario, estado.estado,estado.id AS id_estado, 
+               pedido_herramientas.cantidad, pedido_herramientas.devueltos AS devueltos
         FROM pedidos
         INNER JOIN usuarios ON usuarios.id = pedidos.usuario_fk
         INNER JOIN estado ON pedidos.estado_fk = estado.id
@@ -512,6 +516,7 @@ def obtener_pedidos():
 
                 pedidos_dict[pedido_id] = {
                     "estado": pedido['estado'],
+                    "id_estado": pedido['id_estado'],
                     "id_pedido": pedido['id_pedido'],
                     "nombre_usuario": pedido['nombre_usuario'],
                     "fecha": pedido['fecha'].strftime("%Y-%m-%d"),
@@ -524,6 +529,7 @@ def obtener_pedidos():
                 "nombre": pedido['nombre_herramienta'],
                 "cantidad": pedido['cantidad'],
                 "id": pedido['id_her'],
+                "devueltos": pedido['devueltos'],
                 "tabla": "herramienta",
 
             })
@@ -544,6 +550,7 @@ def obtener_pedidos():
                     "nombre": consumible['nombre'],
                     "cantidad": consumible['cantidad'],
                     "id": consumible['id'],
+                    "devueltos": 0,
                     "tabla": "consumible",
                 })
 
@@ -611,12 +618,14 @@ def cambiar_estado_pedido():
 
             if fila_dict.get('consumible_id_fk') is not None:
                 consumibles_list.append({
+                    'id': fila_dict['id'],
                     'pedido_id_fk': fila_dict['pedido_id_fk'],
                     'consumible_id_fk': fila_dict['consumible_id_fk'],
                     'cantidad': fila_dict['cantidad']
                 })
             if fila_dict.get('herramienta_id_fk') is not None:
                 herramientas_list.append({
+                    'id': fila_dict['id'],
                     'cantidad': fila_dict['cantidad'],
                     'herramienta_id_fk': fila_dict['herramienta_id_fk'],
                     'pedido_id_fk': fila_dict['pedido_id_fk']
@@ -624,7 +633,7 @@ def cambiar_estado_pedido():
 
         cursor.execute("UPDATE pedidos SET estado_fk = %s WHERE id = %s", (estado_id, pedido_id))
 
-        if estado_nombre in ["Cancelado", "Devuelto"]:
+        if estado_nombre in ["Cancelado", "Devuelto", "Bajo seguimiento"]:
             for consumible in consumibles_list:  
                 #print(consumible) 
                 if estado_nombre == "Cancelado":
@@ -632,14 +641,13 @@ def cambiar_estado_pedido():
                         "UPDATE consumibles SET cantidad = cantidad + %s WHERE id = %s AND cantidad >= %s",
                         (consumible["cantidad"], consumible["consumible_id_fk"], 1)  
                     )
-                    
-                else:
+                elif estado_nombre == "Devuelto":
                     cantidad = obtener_cantidad_por_id(cantidades, consumible["consumible_id_fk"])
                     cursor.execute(
                         "UPDATE consumibles SET cantidad = cantidad + %s WHERE id = %s AND cantidad >= %s",
                         (cantidad, consumible["consumible_id_fk"], 1) 
                     )
-
+            print(estado_nombre)
             for herramienta in herramientas_list:  
                 #print(herramienta) 
                 if estado_nombre == "Cancelado":
@@ -647,11 +655,17 @@ def cambiar_estado_pedido():
                         "UPDATE tipos_herramienta th JOIN herramientas h ON th.id = h.tipo_id SET th.disponibles = th.disponibles + %s WHERE h.id = %s",
                         (herramienta["cantidad"], herramienta["herramienta_id_fk"])
                     )
-                else:
+                elif estado_nombre == "Devuelto":
                     cantidad = obtener_cantidad_por_id(cantidades, herramienta["herramienta_id_fk"])
                     cursor.execute(
                         "UPDATE tipos_herramienta th JOIN herramientas h ON th.id = h.tipo_id SET th.disponibles = th.disponibles + %s WHERE h.id = %s",
                         (cantidad, herramienta["herramienta_id_fk"])
+                    )
+                else:
+                    cantidad = obtener_cantidad_por_id(cantidades, herramienta["herramienta_id_fk"])
+                    cursor.execute(
+                        "UPDATE pedido_herramientas SET devueltos = %s WHERE id = %s",
+                        (cantidad, herramienta["id"])  
                     )
 
         mysql.connection.commit()
