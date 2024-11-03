@@ -811,36 +811,61 @@ def obtener_categoria_consumibles():
 
 @app.route('/subcategorias_herramientas', methods=['GET'])
 def obtener_subcategorias_herramientas():
+    categoria_id = request.args.get('categoria_id')
+
     with mysql.connection.cursor(MySQLdb.cursors.DictCursor) as cursor:
-        cursor.execute("""
-            SELECT DISTINCT subcategorias.id, subcategorias.nombre
-            FROM subcategorias
-            JOIN tipos_herramienta ON subcategorias.id = tipos_herramienta.subcategoria_id
-            JOIN herramientas ON tipos_herramienta.id = herramientas.tipo_id
-        """)
+        if categoria_id:
+            cursor.execute("""
+                SELECT DISTINCT subcategorias.id, subcategorias.nombre
+                FROM subcategorias
+                JOIN tipos_herramienta ON subcategorias.id = tipos_herramienta.subcategoria_id
+                JOIN herramientas ON tipos_herramienta.id = herramientas.tipo_id
+                WHERE subcategorias.categoria_id = %s
+            """, (categoria_id,))
+        else:
+            cursor.execute("""
+                SELECT DISTINCT subcategorias.id, subcategorias.nombre
+                FROM subcategorias
+                JOIN tipos_herramienta ON subcategorias.id = tipos_herramienta.subcategoria_id
+                JOIN herramientas ON tipos_herramienta.id = herramientas.tipo_id
+            """)
         
         subcategorias_herramientas = cursor.fetchall()
 
     if subcategorias_herramientas:
         return jsonify(subcategorias_herramientas), 200
     else:
-        return jsonify({'message': 'No se encontraron subcategorías de herramientas'}), 404
+        return jsonify({'message': 'No se encontraron subcategorías para esta categoría'}), 404
 
 @app.route('/subcategorias_consumibles', methods=['GET'])
 def obtener_subcategorias_consumibles():
+    categoria_id = request.args.get('categoria_id')
+    
     with mysql.connection.cursor(MySQLdb.cursors.DictCursor) as cursor:
-        cursor.execute("""
-            SELECT DISTINCT subcategorias.id, subcategorias.nombre
-            FROM subcategorias
-            JOIN consumibles ON subcategorias.id = consumibles.subcategoria_id
-        """)
-        
+        if categoria_id:
+            # Filtrar subcategorías según la categoría seleccionada
+            cursor.execute("""
+                SELECT DISTINCT subcategorias.id, subcategorias.nombre
+                FROM subcategorias
+                JOIN consumibles ON subcategorias.id = consumibles.subcategoria_id
+                WHERE subcategorias.categoria_id = %s
+            """, (categoria_id,))
+        else:
+            # Obtener todas las subcategorías si no hay categoría seleccionada
+            cursor.execute("""
+                SELECT DISTINCT subcategorias.id, subcategorias.nombre
+                FROM subcategorias
+                JOIN consumibles ON subcategorias.id = consumibles.subcategoria_id
+            """)
+
         subcategorias_consumibles = cursor.fetchall()
 
     if subcategorias_consumibles:
         return jsonify(subcategorias_consumibles), 200
     else:
-        return jsonify({'message': 'No se encontraron subcategorías de consumibles'}), 404
+        return jsonify({'message': 'No se encontraron subcategorías para esta categoría'}), 404
+
+
 
 
 
@@ -848,19 +873,43 @@ def obtener_subcategorias_consumibles():
 
 @app.route('/tipos_herramienta', methods=['GET'])
 def obtener_tipos_herramienta():
+    categoria_id = request.args.get('categoria_id')
+    subcategoria_id = request.args.get('subcategoria_id')
+
+    query = """
+        SELECT DISTINCT tipos_herramienta.id, tipos_herramienta.nombre
+        FROM tipos_herramienta
+        JOIN herramientas ON herramientas.tipo_id = tipos_herramienta.id
+        JOIN subcategorias ON subcategorias.id = tipos_herramienta.subcategoria_id
+    """
+    params = []
+
+    # Añadir condiciones a la consulta en función de los IDs proporcionados
+    where_clauses = []
+    
+    if categoria_id:
+        where_clauses.append("subcategorias.categoria_id = %s")
+        params.append(categoria_id)
+
+    if subcategoria_id:
+        where_clauses.append("tipos_herramienta.subcategoria_id = %s")
+        params.append(subcategoria_id)
+
+    # Si hay condiciones, agregarlas a la consulta
+    if where_clauses:
+        query += " WHERE " + " AND ".join(where_clauses)
+
     with mysql.connection.cursor(MySQLdb.cursors.DictCursor) as cursor:
-        cursor.execute("""
-            SELECT DISTINCT tipos_herramienta.id, tipos_herramienta.nombre
-            FROM tipos_herramienta
-            JOIN herramientas ON herramientas.tipo_id = tipos_herramienta.id
-        """)
-        
+        cursor.execute(query, params)
         tipos_herramienta = cursor.fetchall()
 
     if tipos_herramienta:
         return jsonify(tipos_herramienta), 200
     else:
         return jsonify({'message': 'No se encontraron tipos de herramientas'}), 404
+
+
+
 
 
 
