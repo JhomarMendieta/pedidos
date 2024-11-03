@@ -7,13 +7,13 @@ function obtenerPedidosUsuario() {
         .then(response => response.json())
         .then(data => mostrarPedidos(data))
         .catch(error =>  {console.error('Error al obtener los pedidos:', error)
-        sinconexion()
+        sinconexion(error)
         });
 }
 
-function sinconexion() {
+function sinconexion(error) {
     const contenedor = document.getElementById('contenedor-tu-pedido');
-    contenedor.innerHTML = '<div class="sinconexion">sin conexión<div>';
+    contenedor.innerHTML = '<div class="sinconexion">'+error+'<div>';
 }
 function mostrarPedidos(pedidos) {
     const contenedor = document.getElementById('contenedor-tu-pedido');
