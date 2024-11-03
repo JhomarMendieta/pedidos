@@ -26,7 +26,7 @@ function mostrarHerramientasPedidas() {
 
         contenedor.appendChild(pedidoElemento);
     });
-
+    contenedor.innerHTML = contenedor.innerHTML+ '<button class="buscar_filtro" id="enviarPedidoBtn">Enviar pedido</button>'
     const botonesEliminar = document.querySelectorAll('.eliminar_herramienta');
     botonesEliminar.forEach(boton => {
         boton.addEventListener('click', (e) => {
