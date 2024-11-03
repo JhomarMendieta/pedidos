@@ -42,7 +42,7 @@ async function obtenerHerramientas(query = '', categoriaId = '', subcategoriaId 
 
     } catch (error) {
         console.error('Error al obtener las herramientas:', error);
-        alert('Hubo un error al obtener las herramientas.');
+        alert('No sé logro encontrar la herramienta');
     }
 }
 
@@ -71,7 +71,7 @@ async function obtenerConsumibles(query = '', categoriaId = '', subcategoriaId =
 
     } catch (error) {
         console.error('Error al obtener los consumibles:', error);
-        alert('Hubo un error al obtener los consumibles.');
+        alert('No sé logro encontrar el consumible');
     }
 }
 

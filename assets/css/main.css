@@ -258,12 +258,29 @@
 .contenedor_herramientas .buscar_filtro:hover {
     box-shadow: 1px 0px 10px var(--objetosOscuros);
 }
+.main .buscar_filtro {
+    width: 100%;
+    margin: 0 auto;
+    padding: 10px;
+    border: none;
+    outline: none;
+    background-color: var(--btn-blue);
+    color: #fff;
+    border-radius: 5px;
+    box-shadow: 1px 0px 2px var(--objetosOscuros);
+    cursor: pointer;
+}
 
+.main .buscar_filtro:hover {
+    box-shadow: 1px 0px 10px var(--objetosOscuros);
+}
 .contenedor_herramientas .contenedor-lista-herramientas,
 .contenedor-herramientas-pedidas {
     display: grid;
     gap: 10px;
     margin-top: 20px;
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 .contenedor_herramientas .contenedor-lista-herramientas .herramienta,
