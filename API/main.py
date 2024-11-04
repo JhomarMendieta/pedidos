@@ -758,7 +758,7 @@ def obtener_herramientas():
             params.append(tipo_id)
 
         if conditions:
-            base_query += " WHERE " + " AND ".join(conditions)
+            base_query += " WHERE  " + " AND ".join(conditions)
 
         cursor.execute(base_query, tuple(params))
         datos_herramienta_pedidos = cursor.fetchall()
