@@ -98,7 +98,7 @@ function mostrarPedidos(pedidos) {
                          ${pedido.estado === "Cancelado" 
                             ? `<label style="text-decoration: line-through; color: gray;">${herramienta.nombre} - x${herramienta.cantidad}</label>` 
                             :pedido.estado === "Bajo seguimiento" && herramienta.tabla == "consumible" || "Bajo seguimiento" && herramienta.tabla == "herramienta" && herramienta.cantidad == herramienta.devueltos 
-                            ? `<label style="text-decoration: line-through; color: gray;">${herramienta.nombre} - x${herramienta.cantidad}</label>` 
+                            ? `<label style="background-color: lightgreen;">${herramienta.nombre} - x${herramienta.cantidad}</label>` 
                             :pedido.estado === "Bajo seguimiento" && herramienta.tabla == "herramienta" && herramienta.cantidad != herramienta.devueltos 
                             ? `<label style="background-color: red; color:white;">${herramienta.nombre} - ${herramienta.devueltos}/${herramienta.cantidad}</label>` 
                             : `<input type="checkbox" ${pedido.estado === "Devuelto" ? "checked" : ""}>
@@ -187,6 +187,7 @@ function cambiarEstado(pedidoId) {
             respuesta = verificarCheckboxes(pedidoId)
             if(respuesta.todosMarcados){
                 if(!respuesta.sino){
+                    alert("El pedido parece correcto");
                     enviar(selectEstado,nuevoEstadoId,pedidoId,respuesta.cantidades)
                 }else{
                     alert("El pedido debe enviarse a observación por falta de unidades");

@@ -413,10 +413,17 @@ def eliminar_categoria():
 
 
 
+from flask import jsonify, request
+from datetime import timedelta
+import MySQLdb
+
 @app.route('/obtener_pedidos_usuario', methods=['GET'])
 def obtener_pedidos_usuario():
     try:
         usuario_id = request.args.get('usuario_id')
+        if not usuario_id:
+            return jsonify({"error": "usuario_id es requerido"}), 400
+        
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         
         consulta = '''
@@ -434,6 +441,7 @@ def obtener_pedidos_usuario():
         for pedido in datos_pedidos:
             pedido_id = pedido['id']
             if pedido_id not in pedidos_dict:
+                # Convertir la hora en cadena si es necesario
                 hora = str(pedido['horario']) if isinstance(pedido['horario'], timedelta) else pedido['horario']
 
                 pedidos_dict[pedido_id] = {
@@ -443,23 +451,26 @@ def obtener_pedidos_usuario():
                     "herramientas": []
                 }
 
+            # Consulta de herramientas asociadas al pedido
             consulta_herramientas = '''
-                SELECT c.nombre, pc.cantidad
-                FROM tipos_herramienta c
-                JOIN pedido_herramientas pc ON c.id = pc.herramienta_id_fk
-                WHERE pc.pedido_id_fk = %s
+                 SELECT tipos_herramienta.nombre AS nombre_herramienta, herramientas.id AS id_her,
+                   pedido_herramientas.cantidad, pedido_herramientas.devueltos
+            FROM pedido_herramientas
+            INNER JOIN herramientas ON herramientas.id = pedido_herramientas.herramienta_id_fk
+            INNER JOIN tipos_herramienta ON tipos_herramienta.id = herramientas.tipo_id
+            WHERE pedido_herramientas.pedido_id_fk = %s
             '''
             cursor.execute(consulta_herramientas, (pedido_id,))
             herramientas = cursor.fetchall()
             for herramienta in herramientas:
                 pedidos_dict[pedido_id]["herramientas"].append({
-                    "nombre": herramienta['nombre'],
+                    "nombre": herramienta['nombre_herramienta'],
                     "cantidad": herramienta['cantidad'],
                     "tabla": "herramienta",
-                    "devueltos": 0  # Asignar un valor predeterminado para "devueltos"
+                    "devueltos": herramienta['devueltos']
                 })
 
-        # Consulta para obtener los consumibles y asignarlos solo una vez por cada pedido
+        # Consulta para obtener los consumibles asociados al pedido
         for pedido_id in pedidos_dict:
             consulta_consumibles = '''
                 SELECT c.nombre, pc.cantidad
@@ -479,11 +490,15 @@ def obtener_pedidos_usuario():
                     "devueltos": 0
                 })
 
+        # Convertir el diccionario de pedidos a una lista
         resultado = list(pedidos_dict.values())
         cursor.close()
+        
         return jsonify(resultado)
     except Exception as e:
         print(f"Error: {e}")
+        if 'cursor' in locals():
+            cursor.close()
         return jsonify({"error": str(e)}), 500
 
 

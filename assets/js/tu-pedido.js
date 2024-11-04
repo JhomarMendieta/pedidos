@@ -48,9 +48,9 @@ function mostrarPedidos(pedidos) {
                          ${pedido.estado === "Cancelado"
                             ? `<label style="text-decoration: line-through; color: gray;">${herramienta.nombre} - x${herramienta.cantidad}</label>`
                             :pedido.estado === "Bajo seguimiento" && herramienta.tabla == "consumible" || "Bajo seguimiento" && herramienta.tabla == "herramienta" && herramienta.cantidad == herramienta.devueltos 
-                            ? `<label style="text-decoration: line-through; color: gray;">${herramienta.nombre} - x${herramienta.cantidad}</label>`  
+                            ? `<label style="background-color: lightgreen;">${herramienta.nombre} - x${herramienta.cantidad}</label>`  
                             :pedido.estado === "Bajo seguimiento" && herramienta.tabla == "herramienta" && herramienta.cantidad != herramienta.devueltos 
-                             ? `<label style="background-color: purple; color:white;">${herramienta.nombre} - ${herramienta.cantidad - herramienta.devueltos}/${herramienta.cantidad}</label>` 
+                             ? `<label style="background-color: red; color:white;">${herramienta.nombre} - ${herramienta.cantidad - herramienta.devueltos}/${herramienta.cantidad}</label>` 
                             : pedido.estado === "Devuelto" ? `<label style="background-color: lightgreen;">${herramienta.nombre} - x${herramienta.cantidad}</label>` : `<label>${herramienta.nombre} - x${herramienta.cantidad}</label>`
                         }
                         
