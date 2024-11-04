@@ -413,7 +413,6 @@ def eliminar_categoria():
 
 
 
-
 @app.route('/obtener_pedidos_usuario', methods=['GET'])
 def obtener_pedidos_usuario():
     try:
@@ -421,16 +420,12 @@ def obtener_pedidos_usuario():
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         
         consulta = '''
-        SELECT pedidos.id, pedidos.fecha, pedidos.horario, estado.estado, 
-               pedido_herramientas.cantidad,pedido_herramientas.devueltos AS devueltos, tipos_herramienta.nombre 
-        FROM pedidos
-        INNER JOIN usuarios ON usuarios.id = pedidos.usuario_fk
-        INNER JOIN estado ON pedidos.estado_fk = estado.id
-        INNER JOIN pedido_herramientas ON pedido_herramientas.pedido_id_fk = pedidos.id
-        INNER JOIN herramientas ON herramientas.id = pedido_herramientas.herramienta_id_fk
-        INNER JOIN tipos_herramienta ON tipos_herramienta.id = herramientas.tipo_id
-        WHERE usuarios.id = %s
-        ORDER BY pedidos.fecha DESC, pedidos.horario DESC
+            SELECT pedidos.id, pedidos.fecha, pedidos.horario, estado.estado
+            FROM pedidos
+            INNER JOIN usuarios ON usuarios.id = pedidos.usuario_fk
+            INNER JOIN estado ON pedidos.estado_fk = estado.id
+            WHERE usuarios.id = %s
+            ORDER BY pedidos.fecha DESC, pedidos.horario DESC
         '''
         cursor.execute(consulta, (usuario_id,))
         datos_pedidos = cursor.fetchall()
@@ -447,22 +442,30 @@ def obtener_pedidos_usuario():
                     "hora": hora, 
                     "herramientas": []
                 }
-            
-            # Agregar herramienta a la lista
-            pedidos_dict[pedido_id]["herramientas"].append({
-                "nombre": pedido['nombre'],
-                "cantidad": pedido['cantidad'],
-                "tabla": "herramienta",
-                "devueltos": pedido['devueltos']
-            })
+
+            consulta_herramientas = '''
+                SELECT c.nombre, pc.cantidad
+                FROM tipos_herramienta c
+                JOIN pedido_herramientas pc ON c.id = pc.herramienta_id_fk
+                WHERE pc.pedido_id_fk = %s
+            '''
+            cursor.execute(consulta_herramientas, (pedido_id,))
+            herramientas = cursor.fetchall()
+            for herramienta in herramientas:
+                pedidos_dict[pedido_id]["herramientas"].append({
+                    "nombre": herramienta['nombre'],
+                    "cantidad": herramienta['cantidad'],
+                    "tabla": "herramienta",
+                    "devueltos": 0  # Asignar un valor predeterminado para "devueltos"
+                })
 
         # Consulta para obtener los consumibles y asignarlos solo una vez por cada pedido
         for pedido_id in pedidos_dict:
             consulta_consumibles = '''
-            SELECT c.nombre, pc.cantidad
-            FROM consumibles c
-            JOIN pedido_consumibles pc ON c.id = pc.consumible_id_fk
-            WHERE pc.pedido_id_fk = %s
+                SELECT c.nombre, pc.cantidad
+                FROM consumibles c
+                JOIN pedido_consumibles pc ON c.id = pc.consumible_id_fk
+                WHERE pc.pedido_id_fk = %s
             '''
             cursor.execute(consulta_consumibles, (pedido_id,))
             consumibles = cursor.fetchall()
@@ -488,24 +491,22 @@ def obtener_pedidos_usuario():
 def obtener_pedidos():
     try:
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        consulta = 'SELECT estado.id, estado.estado FROM estado'
-        cursor.execute(consulta)
+
+        # Consulta para obtener los estados
+        consulta_estados = 'SELECT estado.id, estado.estado FROM estado'
+        cursor.execute(consulta_estados)
         estados = cursor.fetchall()
 
-        consulta = '''
-        SELECT pedidos.id AS id_pedido, tipos_herramienta.nombre AS nombre_herramienta, herramientas.id AS id_her,
-               usuarios.nombre AS nombre_usuario, pedidos.fecha, pedidos.horario, estado.estado,estado.id AS id_estado, 
-               pedido_herramientas.cantidad, pedido_herramientas.devueltos AS devueltos
+        # Consulta para obtener los pedidos principales
+        consulta_pedidos = '''
+        SELECT pedidos.id AS id_pedido, usuarios.nombre AS nombre_usuario, pedidos.fecha, pedidos.horario, 
+               estado.estado, estado.id AS id_estado
         FROM pedidos
         INNER JOIN usuarios ON usuarios.id = pedidos.usuario_fk
         INNER JOIN estado ON pedidos.estado_fk = estado.id
-        INNER JOIN pedido_herramientas ON pedido_herramientas.pedido_id_fk = pedidos.id
-        INNER JOIN herramientas ON herramientas.id = pedido_herramientas.herramienta_id_fk
-        INNER JOIN tipos_herramienta ON tipos_herramienta.id = herramientas.tipo_id
         ORDER BY pedidos.fecha DESC, pedidos.horario DESC
-
         '''
-        cursor.execute(consulta)
+        cursor.execute(consulta_pedidos)
         datos_pedidos = cursor.fetchall()
 
         pedidos_dict = {}
@@ -524,17 +525,29 @@ def obtener_pedidos():
                     "herramientas": []
                 }
 
-            # Agregar herramienta a la lista
-            pedidos_dict[pedido_id]["herramientas"].append({
-                "nombre": pedido['nombre_herramienta'],
-                "cantidad": pedido['cantidad'],
-                "id": pedido['id_her'],
-                "devueltos": pedido['devueltos'],
-                "tabla": "herramienta",
+            # Consulta para obtener las herramientas asociadas a cada pedido
+            consulta_herramientas = '''
+            SELECT tipos_herramienta.nombre AS nombre_herramienta, herramientas.id AS id_her,
+                   pedido_herramientas.cantidad, pedido_herramientas.devueltos
+            FROM pedido_herramientas
+            INNER JOIN herramientas ON herramientas.id = pedido_herramientas.herramienta_id_fk
+            INNER JOIN tipos_herramienta ON tipos_herramienta.id = herramientas.tipo_id
+            WHERE pedido_herramientas.pedido_id_fk = %s
+            '''
+            cursor.execute(consulta_herramientas, (pedido_id,))
+            herramientas = cursor.fetchall()
 
-            })
+            # Agregar cada herramienta a la lista "herramientas"
+            for herramienta in herramientas:
+                pedidos_dict[pedido_id]["herramientas"].append({
+                    "nombre": herramienta['nombre_herramienta'],
+                    "cantidad": herramienta['cantidad'],
+                    "id": herramienta['id_her'],
+                    "devueltos": herramienta['devueltos'],
+                    "tabla": "herramienta"
+                })
 
-            # Consulta para obtener los consumibles asociados al pedido
+            # Consulta para obtener los consumibles asociados a cada pedido
             consulta_consumibles = '''
             SELECT c.nombre, c.id, pc.cantidad
             FROM consumibles c
@@ -544,19 +557,23 @@ def obtener_pedidos():
             cursor.execute(consulta_consumibles, (pedido_id,))
             consumibles = cursor.fetchall()
 
-            # Agregar consumibles a la misma lista "herramientas"
+            # Agregar cada consumible a la misma lista "herramientas"
             for consumible in consumibles:
                 pedidos_dict[pedido_id]["herramientas"].append({
                     "nombre": consumible['nombre'],
                     "cantidad": consumible['cantidad'],
                     "id": consumible['id'],
                     "devueltos": 0,
-                    "tabla": "consumible",
+                    "tabla": "consumible"
                 })
 
+        # Preparar el resultado final
         resultado = list(pedidos_dict.values())
         cursor.close()
+        
+        # Imprimir el resultado (opcional para depuración)
         print(json.dumps({"estados": estados, "pedidos": resultado}, indent=4, ensure_ascii=False))
+        
         return jsonify({"estados": estados, "pedidos": resultado})
     except Exception as e:
         print(f"Error: {e}")

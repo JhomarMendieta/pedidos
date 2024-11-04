@@ -68,7 +68,7 @@ function mostrarPedidos(pedidos) {
                                 }else if (pedido.estado === 'Entregado' && estado.estado != 'Entregado') {
                                     if(estado.estado == "Devuelto" ){
                                     return `
-                                        <option value="${estado.id}" ${estado.estado === pedido.estado ? 'selected' : ''}>${estado.estado}</option>
+                                        <option value="${estado.id}" ${estado.estado === pedido.estado ? 'selected' : ''}>Verificar pedido</option>
                                     `;
                                     }
                                 }else if (pedido.estado === 'Bajo seguimiento' && estado.estado != 'Bajo seguimiento') {
