@@ -20,17 +20,22 @@ function mostrarHerramientasPedidas() {
             <div class="herramienta pedido">
                 <p class="nombre_herramienta">${pedido.nombre}</p>
                 <p class="cantidad_herramienta_pedida">Cant. a pedir: ${pedido.cantidad}</p>
-                <button class="eliminar_herramienta" data-id="${pedido.id}"><i class="fa-solid fa-trash"></i></button>
+                <button class="eliminar_herramienta" data-id="${pedido.id}">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
             </div>
         `;
 
         contenedor.appendChild(pedidoElemento);
     });
-    contenedor.innerHTML = contenedor.innerHTML+ '<button class="buscar_filtro" id="enviarPedidoBtn">Enviar pedido</button>'
+
+    contenedor.innerHTML += '<button class="buscar_filtro" id="enviarPedidoBtn">Enviar pedido</button>';
+
+    // Agrega los eventos de eliminación después de generar los elementos
     const botonesEliminar = document.querySelectorAll('.eliminar_herramienta');
     botonesEliminar.forEach(boton => {
         boton.addEventListener('click', (e) => {
-            const id = e.target.closest('.eliminar_herramienta').dataset.id;
+            const id = e.currentTarget.dataset.id; // Accede al botón directamente
             eliminarPedido(id);
         });
     });
@@ -57,15 +62,15 @@ function eliminarPedido(id) {
                 tabla: pedidoAEliminar.tabla // Asegúrate de que cada pedido tenga este valor
             })
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === "success") {
-                    console.log("Cantidad actualizada en la base de datos");
-                } else {
-                    console.error("Error al actualizar la cantidad en la base de datos");
-                }
-            })
-            .catch(error => console.error("Error en la solicitud:", error));
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                console.log("Cantidad actualizada en la base de datos");
+            } else {
+                console.error("Error al actualizar la cantidad en la base de datos");
+            }
+        })
+        .catch(error => console.error("Error en la solicitud:", error));
     }
 
     // Refresca la lista en la interfaz
@@ -80,6 +85,5 @@ function cerrarModal() {
     }
 }
 
-
-
-window.onload = mostrarHerramientasPedidas();
+// Ejecuta mostrarHerramientasPedidas al cargar la página
+window.onload = mostrarHerramientasPedidas;
