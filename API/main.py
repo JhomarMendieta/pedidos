@@ -739,6 +739,7 @@ def obtener_herramientas():
             INNER JOIN tipos_herramienta thrm ON hrm.tipo_id = thrm.id 
             INNER JOIN subcategorias sctr ON thrm.subcategoria_id = sctr.id 
             INNER JOIN categorias ctr ON sctr.categoria_id = ctr.id
+            WHERE thrm.disponibles >= 1
         """
 
         conditions = []
