@@ -102,7 +102,7 @@ function mostrarPedidos(pedidos) {
                             :pedido.estado === "Bajo seguimiento" && herramienta.tabla == "herramienta" && herramienta.cantidad != herramienta.devueltos 
                             ? `<label style="background-color: red; color:white;">${herramienta.nombre} - ${herramienta.devueltos}/${herramienta.cantidad}</label>` 
                             : `<input type="checkbox" ${pedido.estado === "Devuelto" ? "checked" : ""}>
-                            &nbsp<input type="number" class="cantidad" value="${herramienta.cantidad}" min="0" max="${herramienta.cantidad}">&nbsp;
+                            &nbsp<input type="number" class="cantidad" value="${herramienta.tabla === "consumible" && pedido.estado != "Devuelto" && pedido.estado != "Bajo seguimiento" ? 0 : herramienta.cantidad}" min="0" max="${herramienta.cantidad}">&nbsp;
                             <input type="hidden" class="tabla" value="${herramienta.tabla}">
                             <input type="hidden" class="idinput" value="${herramienta.id}">
                             <input type="hidden" class="cantidadreal" value="${herramienta.cantidad}">
@@ -116,6 +116,8 @@ function mostrarPedidos(pedidos) {
                 <p class="nPedido">N° pedido: ${pedido.id_pedido}</p>
                 <p class="fecha">Fecha: ${pedido.fecha}</p>
                 <p class="hora">Hora: ${pedido.hora}</p>
+                 ${ pedido.estado === "Bajo seguimiento" ?
+                    '<details><div class="chat"></div><form><textarea></textarea> <input type="submit"></form></details>': ""}
             </div>
         </div>
     `;
