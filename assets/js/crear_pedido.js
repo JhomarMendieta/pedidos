@@ -1,8 +1,5 @@
 // Asegúrate de que el script se carga después de que el DOM esté listo
-document.addEventListener("DOMContentLoaded", function () {
-    const enviarPedidoBtn = document.getElementById('enviarPedidoBtn');
-    enviarPedidoBtn.addEventListener('click', enviarPedido);
-});
+
 
 function enviarPedido() {
     // Obtener pedidos del localStorage

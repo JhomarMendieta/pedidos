@@ -30,7 +30,8 @@ function mostrarHerramientasPedidas() {
     });
 
     contenedor.innerHTML += '<button class="buscar_filtro" id="enviarPedidoBtn">Enviar pedido</button>';
-
+    const enviarPedidoBtn = document.getElementById('enviarPedidoBtn');
+    enviarPedidoBtn.addEventListener('click', enviarPedido);
     // Agrega los eventos de eliminación después de generar los elementos
     const botonesEliminar = document.querySelectorAll('.eliminar_herramienta');
     botonesEliminar.forEach(boton => {

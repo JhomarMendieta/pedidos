@@ -473,7 +473,7 @@ def obtener_pedidos_usuario():
         # Consulta para obtener los consumibles asociados al pedido
         for pedido_id in pedidos_dict:
             consulta_consumibles = '''
-                SELECT c.nombre, pc.cantidad
+                SELECT c.nombre, pc.cantidad, pc.devueltos
                 FROM consumibles c
                 JOIN pedido_consumibles pc ON c.id = pc.consumible_id_fk
                 WHERE pc.pedido_id_fk = %s
@@ -487,7 +487,7 @@ def obtener_pedidos_usuario():
                     "nombre": consumible['nombre'],
                     "cantidad": consumible['cantidad'],
                     "tabla": "consumible",
-                    "devueltos": 0
+                    "devueltos": consumible['devueltos']
                 })
 
         # Convertir el diccionario de pedidos a una lista
