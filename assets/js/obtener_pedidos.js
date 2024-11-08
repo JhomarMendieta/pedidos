@@ -114,8 +114,7 @@ function mostrarPedidos(pedidos) {
                 <p class="nPedido">N° pedido: ${pedido.id_pedido}</p>
                 <p class="fecha">Fecha: ${pedido.fecha}</p>
                 <p class="hora">Hora: ${pedido.hora}</p>
-                 ${ pedido.estado === "Bajo seguimiento" ?
-                    '<details><div class="chat"></div><form><textarea></textarea> <input type="submit"></form></details>': ""}
+          
             </div>
         </div>
     `;
@@ -132,7 +131,7 @@ textareas.forEach(textarea => {
 textarea.addEventListener('change', enviarcomentario);
 });
     const numberInputs = document.querySelectorAll('.cantidad'); 
-console.log(numberInputs);
+
 
 numberInputs.forEach(input => {
   input.addEventListener('input', () => {

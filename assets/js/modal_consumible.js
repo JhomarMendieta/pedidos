@@ -44,6 +44,8 @@ function mostrarModalConsumible(id, imagen, nombre, categoria_nombre, subcategor
         // Si la cantidad seleccionada es mayor que la cantidad disponible, ajustarla al máximo
         if (parseInt(cantidadInput.value, 10) > cantidad) {
             cantidadInput.value = cantidad; // Ajustar al máximo disponible
+        }else if (cantidadInput.value < 1) {
+            cantidadInput.value = 1; // Ajustar al máximo disponible
         }
     });
 

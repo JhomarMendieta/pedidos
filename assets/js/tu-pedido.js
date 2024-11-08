@@ -61,8 +61,7 @@ function mostrarPedidos(pedidos) {
                
                 <p class="fecha">Fecha: ${pedido.fecha}</p>
                 <p class="hora">Hora: ${pedido.hora}</p>
-                 ${ pedido.estado === "Bajo seguimiento" ?
-                    '<details><div class="chat"></div><form><textarea></textarea> <input type="submit"></form></details>': ""}
+            
             </div>
         </div>
         `;

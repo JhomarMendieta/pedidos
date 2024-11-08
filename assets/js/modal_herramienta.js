@@ -45,6 +45,8 @@ function mostrarModal(id, imagen, nombre, categoria_nombre, subcategoria_nombre,
         // Si la cantidad seleccionada es mayor que la cantidad disponible, ajustarla al máximo
         if (parseInt(cantidadInput.value, 10) > cantidad) {
             cantidadInput.value = cantidad; // Ajustar al máximo disponible
+        }else  if (cantidadInput.value < 1) {
+            cantidadInput.value = 1; // Ajustar al máximo disponible
         }
     });
 
