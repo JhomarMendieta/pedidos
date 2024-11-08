@@ -41,8 +41,21 @@ function mostrarModal(id, imagen, nombre, categoria_nombre, subcategoria_nombre,
         modal.style.display = "none";
     });
 
+    cantidadInput.addEventListener('input', () => {
+        // Si la cantidad seleccionada es mayor que la cantidad disponible, ajustarla al máximo
+        if (parseInt(cantidadInput.value, 10) > cantidad) {
+            cantidadInput.value = cantidad; // Ajustar al máximo disponible
+        }
+    });
+
     botonAñadir.onclick = () => {
         const cantidadSeleccionada = cantidadInput.value;
+
+        if (parseInt(cantidadSeleccionada, 10) > cantidad) {
+            // Si la cantidad seleccionada es mayor a la cantidad disponible, ajustamos el valor
+            cantidadInput.value = cantidad;
+        }
+
         const pedido = {
             id: id,
             nombre: nombre,

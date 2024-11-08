@@ -39,6 +39,14 @@ function mostrarModalConsumible(id, imagen, nombre, categoria_nombre, subcategor
         modal.style.display = "none";
     });
 
+    // Restricción para que la cantidad no sea mayor que la cantidad disponible
+    cantidadInput.addEventListener('input', () => {
+        // Si la cantidad seleccionada es mayor que la cantidad disponible, ajustarla al máximo
+        if (parseInt(cantidadInput.value, 10) > cantidad) {
+            cantidadInput.value = cantidad; // Ajustar al máximo disponible
+        }
+    });
+
     botonAñadir.onclick = () => {
         const cantidadSeleccionada = cantidadInput.value;
         const pedido = {
