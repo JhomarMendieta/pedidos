@@ -67,9 +67,11 @@
     height: 100%;
     border-radius: 5px;
     box-shadow: 0px 0px 4px inset #898989;
-    display: grid;
-    grid-template-rows: 1fr 50px;
-    place-items: center;
+    text-align: justify;
+    word-wrap: break-word;
+    font-size: 2vh;
+    padding: 1vh;
+    resize: none;
 }
 
 .contenedor-tu-pedido .estado .img i {

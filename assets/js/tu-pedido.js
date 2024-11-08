@@ -24,18 +24,19 @@ function mostrarPedidos(pedidos) {
         ${pedido.estado === "Bajo seguimiento" ? 
          '<div class="contenedor-tu-pedido"  style="border: purple solid 2px;">' : '<div class="contenedor-tu-pedido">' }
             <div class="estado">
-                <p>Estado</p>
-                <div class="img">
-                    <i class="fa-solid fa-image"></i>
+                <p>Comentario</p>
+                <p class="img">
+                
+                    ${pedido.comentario == null || pedido.comentario == undefined? 'Sin comentarios': pedido.comentario}
                   
-                </div>
+                </p>
                   ${pedido.estado === "Cancelado" ?
                 '<div class="etiqueta" style="background-color:red; color: white;">Pedido Cancelado</div>'
                 : pedido.estado === "Bajo seguimiento" ?
                 '<div class="etiqueta" style="background-color:purple; color: white;">Pedido Bajo seguimiento</div>'
                 : pedido.estado === "Devuelto" ?
                     '<div class="etiqueta" style="background-color:green; color: white;">Pedido Devuelto</div>'
-                    : '<div class="etiqueta">' + pedido.estado + '</div>'}
+                    : '<div class="etiqueta" style="background-color:var(--btn-blue); color: white;">' + pedido.estado + '</div>'}
             </div>
             <div class="datos2">
             ${

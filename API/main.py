@@ -12,7 +12,7 @@ CORS(app)
 # Configuración de la base de datos MySQL
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'panol'
+app.config['MYSQL_DB'] = 'panol2'
 app.config['MYSQL_HOST'] = 'localhost'
 
 mysql = MySQL(app)
@@ -417,6 +417,28 @@ from flask import jsonify, request
 from datetime import timedelta
 import MySQLdb
 
+@app.route('/enviar_descargo', methods=['POST'])
+def recibir_descargo():
+    data = request.json
+    pedido_id = data.get('pedido_id')  
+    descargo = data.get('descargo')    
+
+    
+    if not pedido_id or not descargo:
+        return jsonify({'error': 'Faltan datos necesarios'}), 400
+
+    cursor = mysql.connection.cursor()
+    query = """
+        UPDATE pedidos
+        SET descargo = %s
+        WHERE id = %s
+    """
+    cursor.execute(query, (descargo, pedido_id))
+    mysql.connection.commit()
+    cursor.close()
+
+    return jsonify({'message': 'Descargo guardado correctamente'}), 200
+
 @app.route('/obtener_pedidos_usuario', methods=['GET'])
 def obtener_pedidos_usuario():
     try:
@@ -427,7 +449,7 @@ def obtener_pedidos_usuario():
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         
         consulta = '''
-            SELECT pedidos.id, pedidos.fecha, pedidos.horario, estado.estado
+            SELECT pedidos.id, pedidos.fecha,pedidos.descargo, pedidos.horario, estado.estado
             FROM pedidos
             INNER JOIN usuarios ON usuarios.id = pedidos.usuario_fk
             INNER JOIN estado ON pedidos.estado_fk = estado.id
@@ -446,6 +468,7 @@ def obtener_pedidos_usuario():
 
                 pedidos_dict[pedido_id] = {
                     "estado": pedido['estado'],
+                    "comentario": pedido['descargo'],
                     "fecha": pedido['fecha'].strftime("%Y-%m-%d"), 
                     "hora": hora, 
                     "herramientas": []
@@ -514,7 +537,7 @@ def obtener_pedidos():
 
         # Consulta para obtener los pedidos principales
         consulta_pedidos = '''
-        SELECT pedidos.id AS id_pedido, usuarios.nombre AS nombre_usuario, pedidos.fecha, pedidos.horario, 
+        SELECT pedidos.id AS id_pedido, usuarios.nombre AS nombre_usuario, pedidos.fecha, pedidos.descargo AS descargo, pedidos.horario, 
                estado.estado, estado.id AS id_estado
         FROM pedidos
         INNER JOIN usuarios ON usuarios.id = pedidos.usuario_fk
@@ -537,6 +560,7 @@ def obtener_pedidos():
                     "nombre_usuario": pedido['nombre_usuario'],
                     "fecha": pedido['fecha'].strftime("%Y-%m-%d"),
                     "hora": hora,
+                    "comentario": pedido['descargo'],
                     "herramientas": []
                 }
 

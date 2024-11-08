@@ -32,10 +32,8 @@ function mostrarPedidos(pedidos) {
         const pedidoHTML = `
         <div class="contenedor-tu-pedido">
             <div class="estado">
-                <p>Estado</p>
-                <div class="img">
-                    <i class="fa-solid fa-image"></i>
-                </div>
+                <p>Comentario</p>
+                <textarea class="img" max="200" id="${pedido.id_pedido}"${pedido.comentario == null || pedido.comentario == undefined? 'placeholder="Escriba un comentario">': ">"+pedido.comentario}</textarea>
                 <div class="contenedor_estados">
                     ${pedido.estado === "Cancelado" ? 
                         '<button style="background-color:red;"><p>Pedido Cancelado</p></button>' 
@@ -128,6 +126,11 @@ function mostrarPedidos(pedidos) {
         pedidoContenedor.innerHTML = pedidoHTML;
         contenedor.appendChild(pedidoContenedor);
     });
+    const textareas = document.querySelectorAll('textarea.img');
+
+textareas.forEach(textarea => {
+textarea.addEventListener('change', enviarcomentario);
+});
     const numberInputs = document.querySelectorAll('.cantidad'); 
 console.log(numberInputs);
 
@@ -226,3 +229,26 @@ function enviar(selectEstado,nuevoEstadoId,pedidoId,cantidades){
         .catch(error => console.error('Error al cambiar el estado:', error));
     
 }
+
+function enviarcomentario(event) {
+    const textarea = event.target;
+    fetch(`http://127.0.0.1:5000/enviar_descargo`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            pedido_id: textarea.id,
+            descargo: textarea.value,
+        })
+    })
+        .then(response => response.json())
+        .then(data => {
+            alert('Comentario cargado correctamente');
+            obtenerTodosLosPedidos()
+        })
+        .catch(error => console.error('Error al cargar el comentario:', error));
+    
+
+}
+
